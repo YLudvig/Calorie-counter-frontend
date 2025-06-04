@@ -18,7 +18,9 @@ const mealTypes: MealType[] = [
 export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
     const [input, setInput] = useState<MealItem>({
         name: "",
+        date: new Date(),
         mealtype: "",
+        weight: 0,
         calories: 0,
         protein: 0,
         carbs: 0,
@@ -96,6 +98,13 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                             value={input.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
+                        <label>Date:</label>
+                        <input
+                            type="date"
+                            className="mt-2 p-2 border rounded w-full"
+                            value={typeof input.date === "string" ? input.date : input.date.toISOString().slice(0, 10)}
+                            onChange={e => handleChange('date', new Date(e.target.value))}
+                        />
                         <label>Meal type:</label>
                         <select
                             className="mt-2 p-2 border rounded w-full"
@@ -148,6 +157,14 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                             className="mt-2 p-2 border rounded w-full"
                             value={input.fiber}
                             onChange={(e) => handleChange('fiber', Number(e.target.value))}
+                        />
+                        <label>Weight (g):</label>
+                        <input
+                            type="number"
+                            placeholder="Enter weight in grams"
+                            className="mt-2 p-2 border rounded w-full"
+                            value={input.weight}
+                            onChange={(e) => handleChange('weight', Number(e.target.value))}
                         />
                     </form>
                 </div>

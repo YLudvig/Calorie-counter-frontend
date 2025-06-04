@@ -7,8 +7,8 @@ function App() {
   return (
     <div>
       <Calcounter></Calcounter>
-
     </div>
+
   )
 }
 
