@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import type { MealItem } from "../../types/mealtypes";
+import type { MealItem, MealType } from "../../types/mealtypes";
 
 interface MealModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
+    readonly onAction: () => void;
 }
 
-export default function Mealmodal({ isOpen, onClose }: MealModalProps) {
+const mealTypes: MealType[] = [
+    'breakfast',
+    'lunch',
+    'snack',
+    'dinner',
+    'evening snack'
+];
+
+export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
     const [input, setInput] = useState<MealItem>({
         name: "",
+        mealtype: "",
         calories: 0,
         protein: 0,
         carbs: 0,
@@ -37,7 +47,8 @@ export default function Mealmodal({ isOpen, onClose }: MealModalProps) {
             console.log(input);
 
             if (!response.ok) throw new Error('Failed to submit');
-
+            onAction();
+            onClose();
             alert('MealItem added successfully');
         } catch (error) {
             console.error(error);
@@ -85,6 +96,19 @@ export default function Mealmodal({ isOpen, onClose }: MealModalProps) {
                             value={input.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
+                        <label>Meal type:</label>
+                        <select
+                            className="mt-2 p-2 border rounded w-full"
+                            value={input.mealtype}
+                            onChange={(e) => handleChange('mealtype', e.target.value)}
+                        >
+                            <option value="">Select meal type</option>
+                            {mealTypes.map((type) => (
+                                <option key={type} value={type}>
+                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                </option>
+                            ))}
+                        </select>
                         <label>Calories per 100g:</label>
                         <input
                             type="number"

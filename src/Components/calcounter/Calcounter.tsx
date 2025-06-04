@@ -1,17 +1,30 @@
-import { useState } from 'react';
-import type { MealItem } from '../../types/mealtypes';
+import { useEffect, useState } from 'react';
 import Mealmodal from '../modals/Mealmodal';
+import { fetchMeals } from '../API/MealAPICalls';
+import type { MealItem } from '../../types/mealtypes';
 
 
-interface MealItemListProps {
-    items: MealItem[];
-}
 
-export default function MealItemList({ items }: MealItemListProps) {
+export default function MealItemList() {
+    const [mealModalCount, setMealModalCount] = useState(0);
     const [isMealModalOpen, setIsMealModalOpen] = useState(false);
+    const [data, setData] = useState<MealItem[]>([]);
 
     const openModal = () => setIsMealModalOpen(true);
     const closeModal = () => setIsMealModalOpen(false);
+
+    function handleMealModalSubmits(){
+        setMealModalCount(prev => prev +1);
+    }
+
+    useEffect(() => {
+        const getData = async () => {
+            const fetchedData = await fetchMeals();
+            setData(fetchedData);
+        }; 
+        console.log(mealModalCount);
+        getData();
+    }, [mealModalCount]);
 
     return (
         <div>
@@ -23,12 +36,12 @@ export default function MealItemList({ items }: MealItemListProps) {
                     Open Popup
                 </button>
 
-                <Mealmodal isOpen={isMealModalOpen} onClose={closeModal} MealItem={[]}>
+                <Mealmodal isOpen={isMealModalOpen} onClose={closeModal} onAction={handleMealModalSubmits}>
                 </Mealmodal>
             </div>
             <h3>Meal Items</h3>
             <ul>
-                {items.map((item) => (
+                {data.map((item) => (
                     <li key={item.id}>
                         <strong>{item.name}</strong> — {item.calories} kcal | {item.protein}g protein | {item.carbs}g carbs | {item.fat}g fat
                     </li>
