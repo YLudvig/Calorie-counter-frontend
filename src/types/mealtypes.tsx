@@ -9,7 +9,7 @@ export interface MealItem {
     calories: number;
     protein: number;
     carbs: number;
-    fat: number;
+    fats: number;
     fiber: number;
 }
 
