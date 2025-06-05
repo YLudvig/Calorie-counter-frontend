@@ -24,7 +24,7 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
         calories: 0,
         protein: 0,
         carbs: 0,
-        fat: 0,
+        fats: 0,
         fiber: 0
     });
 
@@ -147,8 +147,8 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                             type="number"
                             placeholder="Enter amount of fat"
                             className="mt-2 p-2 border rounded w-full"
-                            value={input.fat}
-                            onChange={(e) => handleChange('fat', Number(e.target.value))}
+                            value={input.fats}
+                            onChange={(e) => handleChange('fats', Number(e.target.value))}
                         />
                         <label>Fiber per 100g:</label>
                         <input

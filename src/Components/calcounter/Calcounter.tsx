@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Mealmodal from '../modals/Mealmodal';
 import { fetchMeals } from '../API/MealAPICalls';
 import type { MealItem } from '../../types/mealtypes';
-import Sidebar from '../sidebar/sidebar';
+import Sidebar from '../sidebar/Sidebar';
 
 
 
@@ -52,7 +52,7 @@ export default function MealItemList() {
                 <ul className="w-full max-w-xl">
                     {data.map((item) => (
                         <li key={item.id} className="mb-2">
-                            <strong>{item.name}</strong> — {item.calories} kcal | {item.protein}g protein | {item.carbs}g carbs | {item.fat}g fat
+                            <strong>{item.name}</strong> — {item.calories} kcal | {item.protein}g protein | {item.carbs}g carbs | {item.fats}g fat
                         </li>
                     ))}
                 </ul>
