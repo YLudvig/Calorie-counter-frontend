@@ -15,18 +15,21 @@ const mealTypes: MealType[] = [
     'evening snack'
 ];
 
+const initialInput: MealItem = {
+    userid: "",
+    name: "",
+    date: new Date().toISOString().slice(0, 10),
+    mealtype: "",
+    weight: 0,
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fats: 0,
+    fiber: 0
+}
+
 export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
-    const [input, setInput] = useState<MealItem>({
-        name: "",
-        date: new Date(),
-        mealtype: "",
-        weight: 0,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fats: 0,
-        fiber: 0
-    });
+    const [input, setInput] = useState<MealItem>(initialInput);
 
     const handleChange = <K extends keyof MealItem>(
         field: K,
@@ -52,6 +55,7 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
             onAction();
             onClose();
             alert('MealItem added successfully');
+            setInput(initialInput);
         } catch (error) {
             console.error(error);
             alert('Submission failed');
@@ -102,8 +106,8 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                         <input
                             type="date"
                             className="mt-2 p-2 border rounded w-full"
-                            value={typeof input.date === "string" ? input.date : input.date.toISOString().slice(0, 10)}
-                            onChange={e => handleChange('date', new Date(e.target.value))}
+                            value={input.date || new Date().toISOString().slice(0, 10)}
+                            onChange={e => handleChange('date', e.target.value)}
                         />
                         <label>Meal type:</label>
                         <select
