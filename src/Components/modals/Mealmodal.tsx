@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { MealItem, MealType } from "../../types/mealtypes";
+import { addMealItem } from "../API/MealAPICalls";
 
 interface MealModalProps {
     readonly isOpen: boolean;
@@ -29,7 +30,19 @@ const initialInput: MealItem = {
 }
 
 export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
-    const [input, setInput] = useState<MealItem>(initialInput);
+    const [input, setInput] = useState<MealItem>({
+        userId: "f3b107d4-80f9-4a92-9403-71f6d2518d99",
+        name: "",
+        date: new Date(),
+        mealtype: "",
+        weight: 0,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        fiber: 0
+    });
+
 
     const handleChange = <K extends keyof MealItem>(
         field: K,
@@ -43,15 +56,8 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
 
     const handleSubmit = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/meal/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(input),
-            });
-
+            await addMealItem(input);
             console.log(input);
-
-            if (!response.ok) throw new Error('Failed to submit');
             onAction();
             onClose();
             alert('MealItem added successfully');

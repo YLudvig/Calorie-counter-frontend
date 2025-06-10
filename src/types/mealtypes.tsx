@@ -1,9 +1,9 @@
 export type MealType = 'breakfast' | 'lunch' | 'snack' | 'dinner' | 'evening snack';
 
 export interface MealItem {
-    mealid?: string;
-    userid: string;
-    date: string;
+    mealId?: string;
+    userId: string;
+    date: Date;
     name: string;
     weight: number;
     mealtype: string;
