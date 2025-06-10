@@ -8,7 +8,7 @@ interface MealModalProps {
     readonly onAction: () => void;
 }
 
-const mealTypes: MealType[] = [
+export const mealTypes: MealType[] = [
     'breakfast',
     'lunch',
     'snack',
@@ -16,8 +16,10 @@ const mealTypes: MealType[] = [
     'evening snack'
 ];
 
+const USER_ID = "f3b107d4-80f9-4a92-9403-71f6d2518d99"
+
 const initialInput: MealItem = {
-    userid: "",
+    userId: USER_ID,
     name: "",
     date: new Date().toISOString().slice(0, 10),
     mealtype: "",
@@ -31,9 +33,9 @@ const initialInput: MealItem = {
 
 export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
     const [input, setInput] = useState<MealItem>({
-        userId: "f3b107d4-80f9-4a92-9403-71f6d2518d99",
+        userId: USER_ID,
         name: "",
-        date: new Date(),
+        date: new Date().toISOString().slice(0, 10),
         mealtype: "",
         weight: 0,
         calories: 0,
@@ -56,7 +58,13 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
 
     const handleSubmit = async () => {
         try {
-            await addMealItem(input);
+            //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
+            // är dock fortfarande logiskt att skicka i gram för tillfället
+            const weightAdjustedInput = {
+                ...input,
+                weight: input.weight / 100,
+            };
+            await addMealItem(weightAdjustedInput);
             console.log(input);
             onAction();
             onClose();
