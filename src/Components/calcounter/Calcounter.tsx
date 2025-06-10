@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import Mealmodal from '../modals/Mealmodal';
-import { fetchMeals } from '../API/MealAPICalls';
+import { fetchMealsByUserAndDate } from '../API/MealAPICalls';
 import type { MealItem } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
-
-
 
 export default function MealItemList() {
     const [mealModalCount, setMealModalCount] = useState(0);
     const [isMealModalOpen, setIsMealModalOpen] = useState(false);
     const [data, setData] = useState<MealItem[]>([]);
+    const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+
+    //Detta är bra för testning, men ska tas bort när userId korrekt hanteras
+    const userId = "f3b107d4-80f9-4a92-9403-71f6d2518d99";
 
     const openModal = () => setIsMealModalOpen(true);
     const closeModal = () => setIsMealModalOpen(false);
@@ -20,12 +22,13 @@ export default function MealItemList() {
 
     useEffect(() => {
         const getData = async () => {
-            const fetchedData = await fetchMeals();
+            const fetchedData = await fetchMealsByUserAndDate(userId, selectedDate);
             setData(fetchedData);
         };
         console.log(mealModalCount);
+        console.log(selectedDate);
         getData();
-    }, [mealModalCount]);
+    }, [mealModalCount, selectedDate]);
 
     return (
         <div className="flex h-screen w-screen">
@@ -45,8 +48,17 @@ export default function MealItemList() {
                     onAction={handleMealModalSubmits}
                 />
 
-                <div className="flex justify-center items-center w-full mb-6">
+                <div className="flex justify-center items-center w-full mb-6 flex-col">
                     <h1 className="text-xl font-semibold">Meal Items</h1>
+                    <label className="flex items-center gap-2 ml-2">
+                        <p className="font-normal">Date:</p>
+                        <input
+                            type="date"
+                            className="p-2 border rounded"
+                            value={selectedDate}
+                            onChange={e => setSelectedDate(e.target.value)}
+                        />
+                    </label>
                 </div>
 
                 <ul className="w-full max-w-xl">
