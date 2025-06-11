@@ -83,7 +83,7 @@ export default function MealItemList() {
                         <p className="font-normal">Date:</p>
                         <input
                             type="date"
-                            className="p-2 border rounded"
+                            className="w-full max-w-xs rounded-lg border border-gray-300 bg-white text-gray-700 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                             value={selectedDate}
                             onChange={e => setSelectedDate(e.target.value)}
                         />

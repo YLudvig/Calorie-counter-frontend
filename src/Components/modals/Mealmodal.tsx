@@ -32,18 +32,8 @@ const initialInput: MealItem = {
 }
 
 export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
-    const [input, setInput] = useState<MealItem>({
-        userId: USER_ID,
-        name: "",
-        date: new Date().toISOString().slice(0, 10),
-        mealtype: "",
-        weight: 0,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fats: 0,
-        fiber: 0
-    });
+    const [input, setInput] = useState<MealItem>(initialInput);
+    const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
 
     const handleChange = <K extends keyof MealItem>(
@@ -57,27 +47,32 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
     };
 
     const handleSubmit = async () => {
-        try {
-            //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
-            // är dock fortfarande logiskt att skicka i gram för tillfället
-            const weightAdjustedInput = {
-                ...input,
-                weight: input.weight / 100,
-            };
-            await addMealItem(weightAdjustedInput);
-            console.log(input);
-            onAction();
-            onClose();
-            alert('MealItem added successfully');
-            setInput(initialInput);
-        } catch (error) {
-            console.error(error);
-            alert('Submission failed');
+        if (!input.name.trim() || !input.mealtype || !input.date) {
+            setFeedback({ message: 'Please fill in date, name and mealtype before submitting', type: 'error' })
+        } else {
+            try {
+                //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
+                // är dock fortfarande logiskt att skicka i gram för tillfället
+                const weightAdjustedInput = {
+                    ...input,
+                    weight: input.weight / 100,
+                };
+                await addMealItem(weightAdjustedInput);
+                setFeedback({ message: 'MealItem added successfully!', type: 'success' });
+                setInput(initialInput);
+                onAction();
+            } catch (error) {
+                setFeedback({ message: 'Submission failed', type: 'error' });
+                console.error(error);
+            }
         }
+
     };
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            setFeedback({ message: '', type: null });
+        }
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
@@ -185,6 +180,16 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                             onChange={(e) => handleChange('weight', Number(e.target.value))}
                         />
                     </form>
+                    {feedback.type === 'success' && (
+                        <div className="mt-2 p-2 bg-green-100 text-green-800 rounded text-center font-semibold">
+                            {feedback.message}
+                        </div>
+                    )}
+                    {feedback.type === 'error' && (
+                        <div className="mt-2 p-2 bg-red-100 text-red-800 rounded text-center font-semibold">
+                            {feedback.message}
+                        </div>
+                    )}
                 </div>
                 <div className="flex justify-center space-x-2">
                     <button
