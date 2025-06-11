@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { MealItem, MealType } from "../../types/mealtypes";
 import { addMealItem } from "../API/MealAPICalls";
+import DatePicker from "react-datepicker";
 
 interface MealModalProps {
     readonly isOpen: boolean;
@@ -103,23 +104,26 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                 </button>
                 <div className="mb-4 flex flex-col space-y-4 font-bold font-serif text-sm">
                     <form action="">
-                        <label>Name:</label>
+                        <label className="font-bold italic" htmlFor="meal-name">Name:</label>
                         <input
+                            id="meal-name"
                             type="text"
                             placeholder="Enter item name"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
-                        <label>Date:</label>
-                        <input
-                            type="date"
+                        <label className="font-bold italic" htmlFor="date">Date:</label> <br/>
+                        <DatePicker
+                            id="date"
+                            selected={input.date ? new Date(input.date) : new Date()}
+                            onChange={date => handleChange('date', date ? (date as Date).toISOString().slice(0, 10) : "")}
+                            dateFormat="yyyy-MM-dd"
                             className="mt-2 p-2 border rounded w-full"
-                            value={input.date || new Date().toISOString().slice(0, 10)}
-                            onChange={e => handleChange('date', e.target.value)}
-                        />
-                        <label>Meal type:</label>
+                        /> <br/>
+                        <label className="font-bold italic" htmlFor="meal-type">Meal type:</label>
                         <select
+                            id="meal-type"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.mealtype}
                             onChange={(e) => handleChange('mealtype', e.target.value)}
@@ -131,48 +135,54 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                                 </option>
                             ))}
                         </select>
-                        <label>Calories per 100g:</label>
+                        <label className="font-bold italic" htmlFor="calories">Calories per 100g:</label>
                         <input
+                            id="calories"
                             type="number"
                             placeholder="Enter amount of calories"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.calories}
                             onChange={(e) => handleChange('calories', Number(e.target.value))}
                         />
-                        <label>Protein per 100g:</label>
+                        <label className="font-bold italic" htmlFor="protein">Protein per 100g:</label>
                         <input
+                            id="protein"
                             type="number"
                             placeholder="Enter amount of protein"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.protein}
                             onChange={(e) => handleChange('protein', Number(e.target.value))}
                         />
-                        <label>Carbs per 100g:</label>
+                        <label className="font-bold italic" htmlFor="carbs">Carbs per 100g:</label>
                         <input
+                            id="carbs"
                             type="number"
                             placeholder="Enter amount of carbs"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.carbs}
                             onChange={(e) => handleChange('carbs', Number(e.target.value))}
                         />
-                        <label>Fat per 100g:</label>
+                        <label className="font-bold italic" htmlFor="fat">Fat per 100g:</label>
                         <input
+                            id="fat"
                             type="number"
                             placeholder="Enter amount of fat"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.fats}
                             onChange={(e) => handleChange('fats', Number(e.target.value))}
                         />
-                        <label>Fiber per 100g:</label>
+                        <label className="font-bold italic" htmlFor="fiber">Fiber per 100g:</label>
                         <input
+                            id="fiber"
                             type="number"
                             placeholder="Enter amount of fiber"
                             className="mt-2 p-2 border rounded w-full"
                             value={input.fiber}
                             onChange={(e) => handleChange('fiber', Number(e.target.value))}
                         />
-                        <label>Weight (g):</label>
+                        <label className="font-bold italic" htmlFor="weight">Weight (g):</label>
                         <input
+                            id="weight"
                             type="number"
                             placeholder="Enter weight in grams"
                             className="mt-2 p-2 border rounded w-full"
