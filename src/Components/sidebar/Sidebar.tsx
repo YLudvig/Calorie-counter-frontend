@@ -1,16 +1,24 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { logout } from "../../Utilities/AuthUtil";
+import type { User } from "../../types/AuthTypes";
 
-export default function Sidebar() {
+type SidebarProps = {
+  user: User;
+  setUser: (user: User | null) => void;
+}
+
+export default function Sidebar({ user, setUser }: SidebarProps) {
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  const userName = localStorage.getItem("userName");
+  const userName = user.username;
 
   function handleLogout(event: React.MouseEvent) {
     event.preventDefault();
-    //logout();
+    setUser(null);
+    logout();
     navigate("/");
   }
 
@@ -20,18 +28,17 @@ export default function Sidebar() {
         <div className="text-2xl mb-4 font-semibold">Caloriecounter</div>
         <div className="flex flex-col">
           <Link
-            to="/overview"
-            className={`block mb-2 rounded px-3 py-2 no-underline ${
-              currentPath === "/overview" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
-            }`}
+            to="/calcounter"
+            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/calcounter" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+              }`}
           >
-            Overview
+            Calcounter
           </Link>
+          {/* Statistics är ej skapad ännu */}
           <Link
             to="/statistics"
-            className={`block mb-2 rounded px-3 py-2 no-underline ${
-              currentPath === "/statistics" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
-            }`}
+            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/statistics" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+              }`}
           >
             Statistics
           </Link>

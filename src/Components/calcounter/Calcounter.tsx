@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import Mealmodal, { mealTypes } from '../modals/Mealmodal';
-import { fetchMealsByUserAndDate } from '../API/MealAPICalls';
+import { fetchMealsByUserAndDate } from '../../API/MealAPICalls';
 import type { MealItem } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import type { User } from '../../types/AuthTypes';
 
-export default function MealItemList() {
+type CalcounterProps = {
+    user: User; 
+    setUser: (user: User | null) => void;
+}
+
+export default function Calcounter({user, setUser}: CalcounterProps) {
     //Används för att hålla koll när mål skapas så att vi refetchar från backend då och förblir uppdaterade
     const [mealModalCount, setMealModalCount] = useState(0);
     //Håller koll på om popup för att skapa mål är öppen eller inte
@@ -63,7 +69,7 @@ export default function MealItemList() {
 
     return (
         <div className="flex h-screen w-screen">
-            <Sidebar />
+            <Sidebar user={user} setUser={setUser}/>
 
             <div className="flex-grow p-6 overflow-auto rounded-lg flex flex-col items-center">
                 <button
