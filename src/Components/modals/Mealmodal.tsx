@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import type { MealItem, MealType } from "../../types/mealtypes";
 import { addMealItem } from "../../API/MealAPICalls";
 import DatePicker from "react-datepicker";
+import type { User } from "../../types/AuthTypes";
 
 interface MealModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
     readonly onAction: () => void;
+    user: User;
 }
 
 export const mealTypes: MealType[] = [
@@ -17,23 +19,20 @@ export const mealTypes: MealType[] = [
     'evening snack'
 ];
 
-//Nyttja en useContext som man setter när man loggar in och som sedan hämtas här för detta värdet alternativt används direkt i intialinput? 
-const USER_ID = "f3b107d4-80f9-4a92-9403-71f6d2518d99"
+export default function Mealmodal({ isOpen, onClose, onAction, user }: MealModalProps) {
+    const initialInput: MealItem = {
+        userId: user.userId,
+        name: "",
+        date: new Date().toISOString().slice(0, 10),
+        mealtype: "",
+        weight: 0,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        fiber: 0
+    }
 
-const initialInput: MealItem = {
-    userId: USER_ID,
-    name: "",
-    date: new Date().toISOString().slice(0, 10),
-    mealtype: "",
-    weight: 0,
-    calories: 0,
-    protein: 0,
-    carbs: 0,
-    fats: 0,
-    fiber: 0
-}
-
-export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps) {
     const [input, setInput] = useState<MealItem>(initialInput);
     const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
@@ -58,6 +57,7 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                 const weightAdjustedInput = {
                     ...input,
                     weight: input.weight / 100,
+                    userId: user.userId,
                 };
                 await addMealItem(weightAdjustedInput);
                 setFeedback({ message: 'MealItem added successfully!', type: 'success' });

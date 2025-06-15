@@ -23,10 +23,6 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
     //från backend och att köra om vår useEffect för att förbli uppdaterad
     const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
 
-
-    //Detta är bra för testning, men ska tas bort när userId korrekt hanteras
-    const userId = "f3b107d4-80f9-4a92-9403-71f6d2518d99";
-
     //Funktioner för att öppna och stänga popupen, kanske skulle kunna ta bort den ena och köra 
     //en logik med ! istället för att minska kod, hade dock skadat läsbarheten
     const openModal = () => setIsMealModalOpen(true);
@@ -40,7 +36,7 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
     //Hämtar data baserat på valt datum och om mål läggs till så att den ska uppdatera dynamiskt och snyggt 
     useEffect(() => {
         const getData = async () => {
-            const fetchedData = await fetchMealsByUserAndDate(userId, selectedDate);
+            const fetchedData = await fetchMealsByUserAndDate(user.userId, selectedDate);
             setData(fetchedData);
         };
         console.log(mealModalCount);
@@ -83,6 +79,7 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                     isOpen={isMealModalOpen}
                     onClose={closeModal}
                     onAction={handleMealModalSubmits}
+                    user={user}
                 />
 
                 <div className="flex justify-center items-center w-full mb-6 flex-col">
@@ -108,11 +105,11 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                                         <tr className="text-left bg-gray-100">
                                             <th className="border px-4 py-2 text-left">Name</th>
                                             <th className="border px-4 py-2 text-left">Date</th>
+                                            <th className="border px-4 py-2 text-left">Calories</th>
                                             <th className="border px-4 py-2 text-left">Protein</th>
                                             <th className="border px-4 py-2 text-left">Carbs</th>
                                             <th className="border px-4 py-2 text-left">Fats</th>
                                             <th className="border px-4 py-2 text-left">Fiber</th>
-                                            <th className="border px-4 py-2 text-left">Calories</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -120,11 +117,11 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                                             <tr key={item.mealId} className="text-left bg-gray-100">
                                                 <td className="border px-4 py-2">{item.name}</td>
                                                 <td className="border px-4 py-2">{item.date}</td>
+                                                <td className="border px-4 py-2">{item.calories * item.weight}</td>
                                                 <td className="border px-4 py-2">{item.protein * item.weight}</td>
                                                 <td className="border px-4 py-2">{item.carbs * item.weight}</td>
                                                 <td className="border px-4 py-2">{item.fats * item.weight}</td>
                                                 <td className="border px-4 py-2">{item.fiber * item.weight}</td>
-                                                <td className="border px-4 py-2">{item.calories * item.weight}</td>
                                             </tr>
                                         ))}
                                         {(() => {
@@ -145,11 +142,11 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                                                     <td className="border px-4 py-2">
                                                         {group.items[0]?.date || ""}
                                                     </td>
+                                                    <td className="border px-4 py-2">{totals.calories}</td>
                                                     <td className="border px-4 py-2">{totals.protein}</td>
                                                     <td className="border px-4 py-2">{totals.carbs}</td>
                                                     <td className="border px-4 py-2">{totals.fats}</td>
                                                     <td className="border px-4 py-2">{totals.fiber}</td>
-                                                    <td className="border px-4 py-2">{totals.calories}</td>
                                                 </tr>
                                             );
                                         })()}
