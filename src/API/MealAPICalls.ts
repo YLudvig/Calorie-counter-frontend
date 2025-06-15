@@ -35,7 +35,7 @@ export async function fetchMealsByUserAndDate(userId: string, date: string) {
 
 export async function addMealItem(mealItem: MealItem) {
     try {
-        const response = await fetch('http://localhost:8080/api/meal/add', {
+        const response = await fetchApi('/meal/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mealItem),
