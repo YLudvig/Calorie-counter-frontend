@@ -1,14 +1,34 @@
 //Behöver enbart importera App.css i denna, komponenter som nyttjas i denna får automatisk styling
 import './App.css'
 import Calcounter from './Components/calcounter/Calcounter'
+import Login from './Components/Login/Login';
+import RegisterForm from './Components/Login/Register';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import ProtectedRoute from './Utilities/ProtectedRoute';
+import { useState } from 'react';
+import type { User } from './types/AuthTypes';
 
 function App() {
 
+  const [user, setUser] = useState<User | null>(null);
+
+
   return (
-    <div>
-      <Calcounter></Calcounter>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login setUser={setUser} />} />
+        <Route
+          path='/calcounter'
+          element={
+            <ProtectedRoute user={user}>
+              {user && <Calcounter user={user} setUser={setUser}/>}
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route path="/register" element={<RegisterForm />} />
+      </Routes>
+    </BrowserRouter>
 
   )
 }

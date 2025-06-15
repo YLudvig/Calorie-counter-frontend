@@ -1,11 +1,12 @@
-import type { MealItem } from '../../types/mealtypes';
+import type { MealItem } from '../types/mealtypes';
+import { fetchApi } from './FetchAPI';
 
 //Denna lär behöva göras om senare så att den enbart gettar användarens mål och inte allas, 
 //kanske till och med specificera till användarens mål för just den dagen om API callsen blir för tunga 
 //Bör tas bort inom kort då den är utdaterad, ska vid den punkten ta bort på backend också 
 export async function fetchMeals() {
     try {
-        const response = await fetch('http://localhost:8080/api/meal/getAll');
+        const response = await fetchApi('/meal/getAll');
         if (!response.ok) {
             throw new Error('Problem med nätverksresponsen');
         }
@@ -19,8 +20,8 @@ export async function fetchMeals() {
 
 export async function fetchMealsByUserAndDate(userId: string, date: string) {
     try {
-        const response = await fetch(
-            `http://localhost:8080/api/meal/getByUserIdAndDate?userId=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`
+        const response = await fetchApi(
+            `/meal/getByUserIdAndDate?userId=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`
         );
         if (!response.ok) {
             throw new Error('Problem med nätverksresponsen');

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { MealItem, MealType } from "../../types/mealtypes";
-import { addMealItem } from "../API/MealAPICalls";
+import { addMealItem } from "../../API/MealAPICalls";
 import DatePicker from "react-datepicker";
 
 interface MealModalProps {
@@ -17,6 +17,7 @@ export const mealTypes: MealType[] = [
     'evening snack'
 ];
 
+//Nyttja en useContext som man setter när man loggar in och som sedan hämtas här för detta värdet alternativt används direkt i intialinput? 
 const USER_ID = "f3b107d4-80f9-4a92-9403-71f6d2518d99"
 
 const initialInput: MealItem = {
@@ -113,14 +114,14 @@ export default function Mealmodal({ isOpen, onClose, onAction }: MealModalProps)
                             value={input.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
-                        <label className="font-bold italic" htmlFor="date">Date:</label> <br/>
+                        <label className="font-bold italic" htmlFor="date">Date:</label> <br />
                         <DatePicker
                             id="date"
                             selected={input.date ? new Date(input.date) : new Date()}
                             onChange={date => handleChange('date', date ? (date as Date).toISOString().slice(0, 10) : "")}
                             dateFormat="yyyy-MM-dd"
                             className="mt-2 p-2 border rounded w-full"
-                        /> <br/>
+                        /> <br />
                         <label className="font-bold italic" htmlFor="meal-type">Meal type:</label>
                         <select
                             id="meal-type"
