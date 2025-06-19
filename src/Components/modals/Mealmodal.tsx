@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { MealItem, MealType } from "../../types/mealtypes";
 import { addMealItem } from "../../API/MealAPICalls";
-import DatePicker from "react-datepicker";
 import type { User } from "../../types/AuthTypes";
 
 interface MealModalProps {
@@ -9,6 +8,7 @@ interface MealModalProps {
     readonly onClose: () => void;
     readonly onAction: () => void;
     user: User;
+    selectedDate: string; 
 }
 
 export const mealTypes: MealType[] = [
@@ -19,7 +19,7 @@ export const mealTypes: MealType[] = [
     'evening snack'
 ];
 
-export default function Mealmodal({ isOpen, onClose, onAction, user }: MealModalProps) {
+export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDate }: MealModalProps) {
     const initialInput: MealItem = {
         userId: user.userId,
         name: "",
@@ -58,6 +58,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user }: MealModal
                     ...input,
                     weight: input.weight / 100,
                     userId: user.userId,
+                    date: selectedDate,
                 };
                 await addMealItem(weightAdjustedInput);
                 setFeedback({ message: 'MealItem added successfully!', type: 'success' });
@@ -114,14 +115,6 @@ export default function Mealmodal({ isOpen, onClose, onAction, user }: MealModal
                             value={input.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
-                        <label className="font-bold italic" htmlFor="date">Date:</label> <br />
-                        <DatePicker
-                            id="date"
-                            selected={input.date ? new Date(input.date) : new Date()}
-                            onChange={date => handleChange('date', date ? (date as Date).toISOString().slice(0, 10) : "")}
-                            dateFormat="yyyy-MM-dd"
-                            className="mt-2 p-2 border rounded w-full"
-                        /> <br />
                         <label className="font-bold italic" htmlFor="meal-type">Meal type:</label>
                         <select
                             id="meal-type"

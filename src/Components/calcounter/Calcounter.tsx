@@ -8,11 +8,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import type { User } from '../../types/AuthTypes';
 
 type CalcounterProps = {
-    user: User; 
+    user: User;
     setUser: (user: User | null) => void;
 }
 
-export default function Calcounter({user, setUser}: CalcounterProps) {
+export default function Calcounter({ user, setUser }: CalcounterProps) {
     //Används för att hålla koll när mål skapas så att vi refetchar från backend då och förblir uppdaterade
     const [mealModalCount, setMealModalCount] = useState(0);
     //Håller koll på om popup för att skapa mål är öppen eller inte
@@ -65,14 +65,14 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
 
     return (
         <div className="flex h-screen w-screen">
-            <Sidebar user={user} setUser={setUser}/>
+            <Sidebar user={user} setUser={setUser} />
 
             <div className="flex-grow p-6 overflow-auto rounded-lg flex flex-col items-center">
                 <button
                     onClick={openModal}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
                 >
-                    Open Popup
+                    Add food
                 </button>
 
                 <Mealmodal
@@ -80,6 +80,7 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                     onClose={closeModal}
                     onAction={handleMealModalSubmits}
                     user={user}
+                    selectedDate={selectedDate}
                 />
 
                 <div className="flex justify-center items-center w-full mb-6 flex-col">
@@ -100,28 +101,26 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                         group.items.length > 0 && (
                             <div key={group.type} className="mb-6">
                                 <h2 className="text-lg font-bold capitalize mb-2">{group.type}</h2>
-                                <table className="min-w-full table-auto border border-gray-300">
+                                <table className="min-w-full table-fixed border border-gray-300">
                                     <thead>
                                         <tr className="text-left bg-gray-100">
-                                            <th className="border px-4 py-2 text-left">Name</th>
-                                            <th className="border px-4 py-2 text-left">Date</th>
-                                            <th className="border px-4 py-2 text-left">Calories</th>
-                                            <th className="border px-4 py-2 text-left">Protein</th>
-                                            <th className="border px-4 py-2 text-left">Carbs</th>
-                                            <th className="border px-4 py-2 text-left">Fats</th>
-                                            <th className="border px-4 py-2 text-left">Fiber</th>
+                                            <th className="border px-4 py-2 text-left w-24">Name</th>
+                                            <th className="border px-4 py-2 text-left w-24">Calories</th>
+                                            <th className="border px-4 py-2 text-left w-24">Protein</th>
+                                            <th className="border px-4 py-2 text-left w-24">Carbs</th>
+                                            <th className="border px-4 py-2 text-left w-24">Fats</th>
+                                            <th className="border px-4 py-2 text-left w-24">Fiber</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {group.items.map(item => (
                                             <tr key={item.mealId} className="text-left bg-gray-100">
-                                                <td className="border px-4 py-2">{item.name}</td>
-                                                <td className="border px-4 py-2">{item.date}</td>
-                                                <td className="border px-4 py-2">{item.calories * item.weight}</td>
-                                                <td className="border px-4 py-2">{item.protein * item.weight}</td>
-                                                <td className="border px-4 py-2">{item.carbs * item.weight}</td>
-                                                <td className="border px-4 py-2">{item.fats * item.weight}</td>
-                                                <td className="border px-4 py-2">{item.fiber * item.weight}</td>
+                                                <td className="border px-4 py-2 w-24">{item.name}</td>
+                                                <td className="border px-4 py-2 w-24">{item.calories * item.weight}</td>
+                                                <td className="border px-4 py-2 w-24">{item.protein * item.weight}</td>
+                                                <td className="border px-4 py-2 w-24">{item.carbs * item.weight}</td>
+                                                <td className="border px-4 py-2 w-24">{item.fats * item.weight}</td>
+                                                <td className="border px-4 py-2 w-24">{item.fiber * item.weight}</td>
                                             </tr>
                                         ))}
                                         {(() => {
@@ -139,14 +138,11 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                                             return (
                                                 <tr className="text-left font-bold bg-gray-200">
                                                     <td className="border px-4 py-2">Total:</td>
-                                                    <td className="border px-4 py-2">
-                                                        {group.items[0]?.date || ""}
-                                                    </td>
-                                                    <td className="border px-4 py-2">{totals.calories}</td>
-                                                    <td className="border px-4 py-2">{totals.protein}</td>
-                                                    <td className="border px-4 py-2">{totals.carbs}</td>
-                                                    <td className="border px-4 py-2">{totals.fats}</td>
-                                                    <td className="border px-4 py-2">{totals.fiber}</td>
+                                                    <td className="border px-4 py-2">{totals.calories.toFixed(0)}</td>
+                                                    <td className="border px-4 py-2">{totals.protein.toFixed(0)}</td>
+                                                    <td className="border px-4 py-2">{totals.carbs.toFixed(0)}</td>
+                                                    <td className="border px-4 py-2">{totals.fats.toFixed(0)}</td>
+                                                    <td className="border px-4 py-2">{totals.fiber.toFixed(0)}</td>
                                                 </tr>
                                             );
                                         })()}
@@ -156,9 +152,15 @@ export default function Calcounter({user, setUser}: CalcounterProps) {
                             </div>
                         )
                     )}
-                    <div className="mt-8 p-4 font-semibold text-lg ">
-                        Day Total: {dailyTotals.calories} kcal | {dailyTotals.protein}g protein | {dailyTotals.carbs}g carbs | {dailyTotals.fats}g fat
+                    {data.length === 0 ? (
+                        <div className="mt-8 p-4 font-semibold text-lg text-center">
+                            No meals added for this day
+                        </div>
+                    ) : (
+                    <div className="mt-8 p-4 font-semibold text-lg text-center">
+                        Total: {dailyTotals.calories.toFixed(0)} kcal | {dailyTotals.protein.toFixed(0)}g protein | {dailyTotals.carbs.toFixed(0)}g carbs | {dailyTotals.fats.toFixed(0)}g fat
                     </div>
+                    )}
                 </div>
             </div>
         </div>
