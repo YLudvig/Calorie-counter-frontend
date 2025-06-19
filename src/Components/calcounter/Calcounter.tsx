@@ -6,6 +6,7 @@ import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import type { User } from '../../types/AuthTypes';
+import React from 'react';
 
 type CalcounterProps = {
     user: User;
@@ -44,14 +45,6 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         getData();
     }, [mealModalCount, selectedDate]);
 
-    //Skapar en kombinations array av mål och måltidstyper så att vi sedan kan 
-    //mappa kombinationen för att få önskat utseende på dagsöversynen
-    const grouped = mealTypes.map(type => ({
-        type,
-        items: data.filter(item => item.mealtype === type)
-    }));
-
-
     //Räknar ihop summan för dagens intag av macros
     const dailyTotals = data.reduce(
         (acc, item) => ({
@@ -59,8 +52,10 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
             protein: acc.protein + item.protein * item.weight,
             carbs: acc.carbs + item.carbs * item.weight,
             fats: acc.fats + item.fats * item.weight,
+            fiber: acc.fiber + item.fiber * item.weight,
+            weight: acc.weight + item.weight,
         }),
-        { calories: 0, protein: 0, carbs: 0, fats: 0 }
+        { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0, weight: 0 }
     );
 
     return (
@@ -96,71 +91,67 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="w-full overflow-x-auto">
-                    {grouped.map(group =>
-                        group.items.length > 0 && (
-                            <div key={group.type} className="mb-6">
-                                <h2 className="text-lg font-bold capitalize mb-2">{group.type}</h2>
-                                <table className="min-w-full table-fixed border border-gray-300">
-                                    <thead>
-                                        <tr className="text-left bg-gray-100">
-                                            <th className="border px-4 py-2 text-left w-24">Name</th>
-                                            <th className="border px-4 py-2 text-left w-24">Calories</th>
-                                            <th className="border px-4 py-2 text-left w-24">Protein</th>
-                                            <th className="border px-4 py-2 text-left w-24">Carbs</th>
-                                            <th className="border px-4 py-2 text-left w-24">Fats</th>
-                                            <th className="border px-4 py-2 text-left w-24">Fiber</th>
+                <div className="w-full overflow-hidden rounded-sm border border-gray-300">
+                    <table className="min-w-full table-fixed">
+                        <tbody>
+                            {mealTypes.map(type => {
+                                const items = data.filter(item => item.mealtype === type);
+                                if (items.length === 0) return null;
+                                const typeTotals = items.reduce(
+                                    (acc, item) => ({
+                                        calories: acc.calories + item.calories * item.weight,
+                                        protein: acc.protein + item.protein * item.weight,
+                                        carbs: acc.carbs + item.carbs * item.weight,
+                                        fats: acc.fats + item.fats * item.weight,
+                                        fiber: acc.fiber + item.fiber * item.weight,
+                                    }),
+                                    { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }
+                                );
+                                return (
+                                    <React.Fragment key={type}>
+                                        <tr>
+                                            <td colSpan={7} className="border bg-gray-200 font-bold px-4 py-2 capitalize text-center">
+                                                {type}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {group.items.map(item => (
-                                            <tr key={item.mealId} className="text-left bg-gray-100">
-                                                <td className="border px-4 py-2 w-24">{item.name}</td>
-                                                <td className="border px-4 py-2 w-24">{item.calories * item.weight}</td>
-                                                <td className="border px-4 py-2 w-24">{item.protein * item.weight}</td>
-                                                <td className="border px-4 py-2 w-24">{item.carbs * item.weight}</td>
-                                                <td className="border px-4 py-2 w-24">{item.fats * item.weight}</td>
-                                                <td className="border px-4 py-2 w-24">{item.fiber * item.weight}</td>
+                                        {items.map(item => (
+                                            <tr key={item.mealId} className="border bg-gray-100">
+                                                <td className="border px-4 py-2">{item.name}</td>
+                                                <td className="border px-4 py-2">{(item.calories * item.weight).toFixed(0)} kcal</td>
+                                                <td className="border px-4 py-2">{(item.protein * item.weight).toFixed(0)}g protein</td>
+                                                <td className="border px-4 py-2">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
+                                                <td className="border px-4 py-2">{(item.fats * item.weight).toFixed(0)}g fats</td>
+                                                <td className="border px-4 py-2">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
                                             </tr>
                                         ))}
-                                        {(() => {
-                                            const totals = group.items.reduce(
-                                                (acc, item) => ({
-                                                    calories: acc.calories + item.calories * item.weight,
-                                                    protein: acc.protein + item.protein * item.weight,
-                                                    carbs: acc.carbs + item.carbs * item.weight,
-                                                    fats: acc.fats + item.fats * item.weight,
-                                                    fiber: acc.fiber + item.fiber * item.weight,
-                                                }),
-                                                { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }
-                                            );
-                                            // Access the date from the first item in the group (if exists)
-                                            return (
-                                                <tr className="text-left font-bold bg-gray-200">
-                                                    <td className="border px-4 py-2">Total:</td>
-                                                    <td className="border px-4 py-2">{totals.calories.toFixed(0)}</td>
-                                                    <td className="border px-4 py-2">{totals.protein.toFixed(0)}</td>
-                                                    <td className="border px-4 py-2">{totals.carbs.toFixed(0)}</td>
-                                                    <td className="border px-4 py-2">{totals.fats.toFixed(0)}</td>
-                                                    <td className="border px-4 py-2">{totals.fiber.toFixed(0)}</td>
-                                                </tr>
-                                            );
-                                        })()}
-                                    </tbody>
-                                </table>
-
-                            </div>
-                        )
-                    )}
-                    {data.length === 0 ? (
-                        <div className="mt-8 p-4 font-semibold text-lg text-center">
-                            No meals added for this day
-                        </div>
-                    ) : (
-                    <div className="mt-8 p-4 font-semibold text-lg text-center">
-                        Total: {dailyTotals.calories.toFixed(0)} kcal | {dailyTotals.protein.toFixed(0)}g protein | {dailyTotals.carbs.toFixed(0)}g carbs | {dailyTotals.fats.toFixed(0)}g fat
-                    </div>
-                    )}
+                                        <tr className="border bg-gray-200 font-bold">
+                                            <td className="border px-4 py-2">Total {type}</td>
+                                            <td className="border px-4 py-2">{typeTotals.calories.toFixed(0)} kcal</td>
+                                            <td className="border px-4 py-2">{typeTotals.protein.toFixed(0)}g protein</td>
+                                            <td className="border px-4 py-2">{typeTotals.carbs.toFixed(0)}g carbs</td>
+                                            <td className="border px-4 py-2">{typeTotals.fats.toFixed(0)}g fats</td>
+                                            <td className="border px-4 py-2">{typeTotals.fiber.toFixed(0)}g fiber</td>
+                                        </tr>
+                                    </React.Fragment>
+                                );
+                            })}
+                            <tr className="border bg-gray-300 font-bold">
+                                <td className="border px-4 py-2">Daily total</td>
+                                <td className="border px-4 py-2">{dailyTotals.calories.toFixed(0)} kcal</td>
+                                <td className="border px-4 py-2">{dailyTotals.protein.toFixed(0)}g protein</td>
+                                <td className="border px-4 py-2">{dailyTotals.carbs.toFixed(0)}g carbs</td>
+                                <td className="border px-4 py-2">{dailyTotals.fats.toFixed(0)}g fats</td>
+                                <td className="border px-4 py-2">{dailyTotals.fiber.toFixed(0)}g fiber</td>
+                            </tr>
+                            {data.length === 0 && (
+                                <tr>
+                                    <td colSpan={8} className="border px-4 py-2 text-center">
+                                        No meals added for this day
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

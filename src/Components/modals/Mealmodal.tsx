@@ -12,11 +12,11 @@ interface MealModalProps {
 }
 
 export const mealTypes: MealType[] = [
-    'breakfast',
-    'lunch',
-    'snack',
-    'dinner',
-    'evening snack'
+    'Breakfast',
+    'Lunch',
+    'Snack',
+    'Dinner',
+    'Evening snack'
 ];
 
 export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDate }: MealModalProps) {
@@ -79,27 +79,32 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                onClose();
+                handleClose();
             }
         };
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, onClose]);
+    }, [isOpen, handleClose]);
 
     if (!isOpen) return null;
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
-            onClose();
+            handleClose();
         }
     };
+
+    function handleClose(){
+        setInput(initialInput);
+        onClose();
+    }
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/1 flex items-center justify-center z-50" onClick={handleOverlayClick}>
             <div className="bg-white rounded-lg p-6 relative shadow-lg min-w-[300px] max-w-[50vw] w-full">
                 <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="absolute top-2 right-2 text-gray-500 hover:text-black"
                 >
                     ×
@@ -203,7 +208,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                         Submit
                     </button>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
                         Close
