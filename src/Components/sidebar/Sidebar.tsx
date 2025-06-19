@@ -25,14 +25,14 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
   return (
     <div className="flex flex-col justify-between h-screen p-2 w-[220px]">
       <div>
-        <div className="text-2xl mb-4 font-semibold">Caloriecounter</div>
+        <div className="text-2xl mb-4 font-semibold">Calcounter</div>
         <div className="flex flex-col">
           <Link
             to="/calcounter"
             className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/calcounter" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
               }`}
           >
-            Calcounter
+            Food diary
           </Link>
           {/* Statistics är ej skapad ännu */}
           <Link
