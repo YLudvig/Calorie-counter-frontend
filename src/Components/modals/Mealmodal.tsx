@@ -85,7 +85,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, handleClose]);
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
