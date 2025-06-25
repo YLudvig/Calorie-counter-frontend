@@ -50,17 +50,19 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     }, [mealModalCount, selectedDate]);
 
     async function deleteMealItemById(mealId: string, userId: string) {
-        //Kallar funktionen för att ta bort det 
-        await deleteMealItem(mealId, userId);
-
-        //För att trigga rerender efter tas bort 
-        setMealModalCount(prev => prev + 1);
+        if (confirm("Do you want to delete this item?")) {
+            //Kallar funktionen för att ta bort det 
+            await deleteMealItem(mealId, userId);
+            //För att trigga rerender efter tas bort 
+            setMealModalCount(prev => prev + 1);
+        } else {
+            return;
+        }
     }
 
     async function patchMealItemById(mealItem: MealItem) {
         //Kallar funktionen för att ta bort det 
         await patchMealItem(mealItem);
-
         //För att trigga rerender efter tas bort 
         setMealModalCount(prev => prev + 1);
     }
