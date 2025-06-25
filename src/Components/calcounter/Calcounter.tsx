@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import Mealmodal, { mealTypes } from '../modals/Mealmodal';
-import { fetchMealsByUserAndDate } from '../../API/MealAPICalls';
+import { deleteMealItem, fetchMealsByUserAndDate, patchMealItem } from '../../API/MealAPICalls';
 import type { MealItem } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import type { User } from '../../types/AuthTypes';
 import React from 'react';
+import { FaEdit } from 'react-icons/fa';
 
 type CalcounterProps = {
     user: User;
@@ -29,6 +30,9 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     const openModal = () => setIsMealModalOpen(true);
     const closeModal = () => setIsMealModalOpen(false);
 
+    const [editingMealId, setEditingMealId] = useState<string | null>(null);
+    const [editedWeight, setEditedWeight] = useState<string>('');
+
     //Håller koll på när nya mål läggs till och ändrar mealmodal count vilket i sig trackas av useEffect
     function handleMealModalSubmits() {
         setMealModalCount(prev => prev + 1);
@@ -44,6 +48,24 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         console.log(selectedDate);
         getData();
     }, [mealModalCount, selectedDate]);
+
+    async function deleteMealItemById(mealId: string, userId: string) {
+        if (confirm("Do you want to delete this item?")) {
+            //Kallar funktionen för att ta bort det 
+            await deleteMealItem(mealId, userId);
+            //För att trigga rerender efter tas bort 
+            setMealModalCount(prev => prev + 1);
+        } else {
+            return;
+        }
+    }
+
+    async function patchMealItemById(mealItem: MealItem) {
+        //Kallar funktionen för att ta bort det 
+        await patchMealItem(mealItem);
+        //För att trigga rerender efter tas bort 
+        setMealModalCount(prev => prev + 1);
+    }
 
     //Räknar ihop summan för dagens intag av macros
     const dailyTotals = data.reduce(
@@ -91,8 +113,8 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="w-full overflow-hidden rounded-sm border border-gray-300">
-                    <table className="min-w-full table-fixed">
+                <div className="overflow-x-auto rounded-sm border border-gray-300">
+                    <table className="min-w-full table-fixed border border-gray-400 text-sm">
                         <tbody>
                             {mealTypes.map(type => {
                                 const items = data.filter(item => item.mealtype === type);
@@ -116,32 +138,81 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                         </tr>
                                         {items.map(item => (
                                             <tr key={item.mealId} className="border bg-gray-100">
-                                                <td className="border px-4 py-2">{item.name}</td>
-                                                <td className="border px-4 py-2">{(item.calories * item.weight).toFixed(0)} kcal</td>
-                                                <td className="border px-4 py-2">{(item.protein * item.weight).toFixed(0)}g protein</td>
-                                                <td className="border px-4 py-2">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
-                                                <td className="border px-4 py-2">{(item.fats * item.weight).toFixed(0)}g fats</td>
-                                                <td className="border px-4 py-2">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
+                                                <td className="border px-4 py-2">{item.name}
+                                                    <div className="flex justify-between items-center overflow-x-auto whitespace-nowrap">
+                                                        <button className="text-red-500 pl-2" onClick={() => { if (item.mealId) deleteMealItemById(item.mealId, user.userId) }}>[X]</button>
+                                                    </div>
+                                                </td>
+                                                <td className="border px-4 py-2 text-center">
+                                                    {editingMealId === item.mealId ? (
+                                                        <form
+                                                            onSubmit={(e) => {
+                                                                e.preventDefault();
+                                                                if (item.mealId && editedWeight) {
+                                                                    const updatedItem = {
+                                                                        ...item,
+                                                                        weight: parseFloat(editedWeight) / 100, // divide by 100 to convert from g to portion
+                                                                    };
+                                                                    patchMealItemById(updatedItem);
+                                                                    setEditingMealId(null);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="number"
+                                                                value={editedWeight}
+                                                                autoFocus
+                                                                onChange={(e) => setEditedWeight(e.target.value)}
+                                                                className="w-16 border border-gray-400 rounded px-1"
+                                                            />
+                                                            <button type="submit" className="ml-1 text-green-600">✔</button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setEditingMealId(null)}
+                                                                className="ml-1 text-red-600"
+                                                            >
+                                                                ✖
+                                                            </button>
+                                                        </form>
+                                                    ) : (
+                                                        <>
+                                                            {item.weight * 100}g
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingMealId(item.mealId || '');
+                                                                    setEditedWeight((item.weight * 100).toString());
+                                                                }}
+                                                                className="ml-2 text-blue-600"
+                                                            >
+                                                                <FaEdit />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </td>                                                <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
+                                                <td className="border px-4 py-2 text-center">{(item.protein * item.weight).toFixed(0)}g protein</td>
+                                                <td className="border px-4 py-2 text-center">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
+                                                <td className="border px-4 py-2 text-center">{(item.fats * item.weight).toFixed(0)}g fats</td>
+                                                <td className="border px-4 py-2 text-center">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
                                             </tr>
                                         ))}
                                         <tr className="border bg-gray-200 font-bold">
-                                            <td className="border px-4 py-2">Total {type}</td>
-                                            <td className="border px-4 py-2">{typeTotals.calories.toFixed(0)} kcal</td>
-                                            <td className="border px-4 py-2">{typeTotals.protein.toFixed(0)}g protein</td>
-                                            <td className="border px-4 py-2">{typeTotals.carbs.toFixed(0)}g carbs</td>
-                                            <td className="border px-4 py-2">{typeTotals.fats.toFixed(0)}g fats</td>
-                                            <td className="border px-4 py-2">{typeTotals.fiber.toFixed(0)}g fiber</td>
+                                            <td className="border px-4 py-2 text-center" colSpan={2}>Total {type}</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals.calories.toFixed(0)} kcal</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals.protein.toFixed(0)}g protein</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals.carbs.toFixed(0)}g carbs</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals.fats.toFixed(0)}g fats</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals.fiber.toFixed(0)}g fiber</td>
                                         </tr>
                                     </React.Fragment>
                                 );
                             })}
                             <tr className="border bg-gray-300 font-bold">
-                                <td className="border px-4 py-2">Daily total</td>
-                                <td className="border px-4 py-2">{dailyTotals.calories.toFixed(0)} kcal</td>
-                                <td className="border px-4 py-2">{dailyTotals.protein.toFixed(0)}g protein</td>
-                                <td className="border px-4 py-2">{dailyTotals.carbs.toFixed(0)}g carbs</td>
-                                <td className="border px-4 py-2">{dailyTotals.fats.toFixed(0)}g fats</td>
-                                <td className="border px-4 py-2">{dailyTotals.fiber.toFixed(0)}g fiber</td>
+                                <td className="border px-4 py-2 text-center" colSpan={2}>Daily total</td>
+                                <td className="border px-4 py-2 text-center">{dailyTotals.calories.toFixed(0)} kcal</td>
+                                <td className="border px-4 py-2 text-center">{dailyTotals.protein.toFixed(0)}g protein</td>
+                                <td className="border px-4 py-2 text-center">{dailyTotals.carbs.toFixed(0)}g carbs</td>
+                                <td className="border px-4 py-2 text-center">{dailyTotals.fats.toFixed(0)}g fats</td>
+                                <td className="border px-4 py-2 text-center">{dailyTotals.fiber.toFixed(0)}g fiber</td>
                             </tr>
                             {data.length === 0 && (
                                 <tr>

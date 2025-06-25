@@ -50,3 +50,38 @@ export async function addMealItem(mealItem: MealItem) {
     }
 }
 
+export async function deleteMealItem(mealId: string, userId: string) {
+    console.log("Deleting meal", mealId, userId);
+    try {
+        const response = await fetchApi(
+            `/meal/delete?mealId=${encodeURIComponent(mealId)}&userId=${encodeURIComponent(userId)}`,
+            { method: 'DELETE' }
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return null;
+    } catch (error) {
+        console.error('Problem med att lägga till målet', error);
+        throw error;
+    }
+}
+
+export async function patchMealItem(mealItem: MealItem) {
+    console.log("Patching meal", mealItem);
+    try {
+        const response = await fetchApi(`/meal/patchWeight`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(mealItem),
+        });
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return null;
+    } catch (error) {
+        console.error('Problem med att lägga till målet', error);
+        throw error;
+    }
+}
+
