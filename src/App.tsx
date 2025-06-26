@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ProtectedRoute from './Utilities/ProtectedRoute';
 import { useState } from 'react';
 import type { User } from './types/AuthTypes';
+import WeightTracking from './Components/weighttracking/WeightTracking';
 
 function App() {
 
@@ -23,6 +24,14 @@ function App() {
           element={
             <ProtectedRoute user={user}>
               {user && <Calcounter user={user} setUser={setUser}/>}
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path='/weighttracking'
+          element={
+            <ProtectedRoute user={user}>
+              {user && <WeightTracking user={user} setUser={setUser}/>}
             </ProtectedRoute>
           }
         ></Route>

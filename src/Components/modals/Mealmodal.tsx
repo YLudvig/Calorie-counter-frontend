@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { MealItem, MealType } from "../../types/mealtypes";
-import { addMealItem } from "../../API/MealAPICalls";
+import { type MealItem, type MealType } from "../../types/mealtypes";
+import { addMealItem, fetchMealsByUser } from "../../API/MealAPICalls";
 import type { User } from "../../types/AuthTypes";
 
 interface MealModalProps {
@@ -8,7 +8,7 @@ interface MealModalProps {
     readonly onClose: () => void;
     readonly onAction: () => void;
     user: User;
-    selectedDate: string; 
+    selectedDate: string;
 }
 
 export const mealTypes: MealType[] = [
@@ -35,6 +35,11 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
     const [input, setInput] = useState<MealItem>(initialInput);
     const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+
+    //State som har datan vi hämtar från backend
+    const [data, setData] = useState<MealItem[]>([]);
+
+    const [selectedMealId, setSelectedMealId] = useState<string>("");
 
 
     const handleChange = <K extends keyof MealItem>(
@@ -73,6 +78,10 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     };
 
     useEffect(() => {
+        fetchMealsByUser(user.userId)
+            .then(setData)
+            .catch(console.error);
+        console.log(data);
         if (!isOpen) {
             setFeedback({ message: '', type: null });
         }
@@ -95,8 +104,9 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         }
     };
 
-    function handleClose(){
+    function handleClose() {
         setInput(initialInput);
+        setSelectedMealId("");
         onClose();
     }
 
@@ -111,6 +121,33 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 </button>
                 <div className="mb-4 flex flex-col space-y-4 font-bold font-serif text-sm">
                     <form action="">
+                        <select className="mt-2 p-2 border rounded w-full"
+                        value={selectedMealId}
+                        
+                        onChange={(e) => {
+                            const mealId = e.target.value;
+                            setSelectedMealId(mealId);
+
+                            const selected = data.find(item => item.mealId === mealId);
+                            if (selected){
+                                console.log(selected);
+                                setInput(prev => ({
+                                    ...prev, 
+                                    name: selected.name, 
+                                    calories: selected.calories, 
+                                    protein: selected.protein, 
+                                    carbs: selected.carbs, 
+                                    fats: selected.fats, 
+                                    fiber: selected.fiber
+                                }))
+                            }
+                        }}
+                        >
+                            <option value="">Select from previously added food</option>
+                            {data.map((food) => <option value={food.mealId} key={food.mealId}>
+                                {food.name} ({food.date})
+                            </option>)}
+                        </select>
                         <label className="font-bold italic" htmlFor="meal-name">Name:</label>
                         <input
                             id="meal-name"

@@ -42,6 +42,13 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
           >
             Statistics
           </Link>
+          <Link
+            to="/weighttracking"
+            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/weighttracking" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+              }`}
+          >
+            WeightTracking
+          </Link>
         </div>
       </div>
 
