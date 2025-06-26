@@ -17,10 +17,13 @@ type CalcounterProps = {
 export default function Calcounter({ user, setUser }: CalcounterProps) {
     //Används för att hålla koll när mål skapas så att vi refetchar från backend då och förblir uppdaterade
     const [mealModalCount, setMealModalCount] = useState(0);
+
     //Håller koll på om popup för att skapa mål är öppen eller inte
     const [isMealModalOpen, setIsMealModalOpen] = useState(false);
+
     //State som har datan vi hämtar från backend
     const [data, setData] = useState<MealItem[]>([]);
+
     //State som håller koll på valt datum i select och som vi sedan använder för att fetcha 
     //från backend och att köra om vår useEffect för att förbli uppdaterad
     const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -40,15 +43,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
 
     //Hämtar data baserat på valt datum och om mål läggs till så att den ska uppdatera dynamiskt och snyggt 
     useEffect(() => {
-        const getData = async () => {
-            const fetchedData = await fetchMealsByUserAndDate(user.userId, selectedDate);
-            setData(fetchedData);
-        };
-        console.log(mealModalCount);
-        console.log(selectedDate);
-        getData();
+        fetchMealsByUserAndDate(user.userId, selectedDate)
+            .then(setData)
+            .catch(console.error); 
     }, [mealModalCount, selectedDate]);
 
+    //Funktion för att deleta item
     async function deleteMealItemById(mealId: string, userId: string) {
         if (confirm("Do you want to delete this item?")) {
             //Kallar funktionen för att ta bort det 
@@ -60,6 +60,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         }
     }
 
+    //Funktion för att patcha vikten på mat 
     async function patchMealItemById(mealItem: MealItem) {
         //Kallar funktionen för att ta bort det 
         await patchMealItem(mealItem);

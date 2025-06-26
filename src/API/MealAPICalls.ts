@@ -18,6 +18,7 @@ export async function fetchMeals() {
     }
 }
 
+//Denna nyttjas för att populera tabellen med dagens inputade mat för användaren 
 export async function fetchMealsByUserAndDate(userId: string, date: string) {
     try {
         const response = await fetchApi(
@@ -33,6 +34,23 @@ export async function fetchMealsByUserAndDate(userId: string, date: string) {
     }
 }
 
+//Denna nyttjas för att populera dropdown med ens tidigare val (gör det bättre för användare)
+export async function fetchMealsByUser(userId: string) {
+    try {
+        const response = await fetchApi(
+            `/meal/getByUserId?userId=${encodeURIComponent(userId)}`
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return [];
+    }
+}
+
+//Denna nyttjas för att lägga till mat 
 export async function addMealItem(mealItem: MealItem) {
     try {
         const response = await fetchApi('/meal/add', {
@@ -50,6 +68,7 @@ export async function addMealItem(mealItem: MealItem) {
     }
 }
 
+//Denna nyttjas för att ta bort mat från dagen 
 export async function deleteMealItem(mealId: string, userId: string) {
     console.log("Deleting meal", mealId, userId);
     try {
@@ -67,6 +86,7 @@ export async function deleteMealItem(mealId: string, userId: string) {
     }
 }
 
+//Nyttjas för att patcha (för tillfället kan enbart vikten av ett mål patchas)
 export async function patchMealItem(mealItem: MealItem) {
     console.log("Patching meal", mealItem);
     try {
