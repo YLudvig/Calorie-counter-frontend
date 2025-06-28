@@ -47,7 +47,7 @@ const RegisterForm = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <h1 className="text-4xl font-bold text-blue-500 mb-8 text-center">
-        Planning Poker
+        Calcounter
       </h1>
 
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">

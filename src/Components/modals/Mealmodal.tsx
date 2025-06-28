@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { type MealItem, type MealType } from "../../types/mealtypes";
-import { addMealItem, fetchMealsByUser } from "../../API/MealAPICalls";
+import { addMealItem, fetchMealsByUser, getFoodFromFoodFactsAPI } from "../../API/MealAPICalls";
 import type { User } from "../../types/AuthTypes";
 
 interface MealModalProps {
@@ -41,6 +41,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
     const [selectedMealId, setSelectedMealId] = useState<string>("");
 
+    const [searchTerm, setSearchTerm] = useState<string>("");
+
 
     const handleChange = <K extends keyof MealItem>(
         field: K,
@@ -67,6 +69,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 };
                 await addMealItem(weightAdjustedInput);
                 setFeedback({ message: 'MealItem added successfully!', type: 'success' });
+                setSelectedMealId("");
                 setInput(initialInput);
                 onAction();
             } catch (error) {
@@ -76,6 +79,13 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         }
 
     };
+
+    const handleSubmitInputOFFAPI = async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (searchTerm != null) {
+            getFoodFromFoodFactsAPI(searchTerm);
+        }
+    }
 
     useEffect(() => {
         fetchMealsByUser(user.userId)
@@ -119,29 +129,39 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 >
                     ×
                 </button>
+                <form onSubmit={handleSubmitInputOFFAPI}>
+                    <input type="text"
+                        className="mt-2 p-2 border rounded w-full"
+                        placeholder="Search for food"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        required
+                    />
+                    <button type="submit" className="px-4 py-2 p-2 mt-2 bg-blue-500 text-white rounded hover:bg-blue-600">Search</button>
+                </form>
                 <div className="mb-4 flex flex-col space-y-4 font-bold font-serif text-sm">
                     <form action="">
                         <select className="mt-2 p-2 border rounded w-full"
-                        value={selectedMealId}
-                        
-                        onChange={(e) => {
-                            const mealId = e.target.value;
-                            setSelectedMealId(mealId);
+                            value={selectedMealId}
 
-                            const selected = data.find(item => item.mealId === mealId);
-                            if (selected){
-                                console.log(selected);
-                                setInput(prev => ({
-                                    ...prev, 
-                                    name: selected.name, 
-                                    calories: selected.calories, 
-                                    protein: selected.protein, 
-                                    carbs: selected.carbs, 
-                                    fats: selected.fats, 
-                                    fiber: selected.fiber
-                                }))
-                            }
-                        }}
+                            onChange={(e) => {
+                                const mealId = e.target.value;
+                                setSelectedMealId(mealId);
+
+                                const selected = data.find(item => item.mealId === mealId);
+                                if (selected) {
+                                    console.log(selected);
+                                    setInput(prev => ({
+                                        ...prev,
+                                        name: selected.name,
+                                        calories: selected.calories,
+                                        protein: selected.protein,
+                                        carbs: selected.carbs,
+                                        fats: selected.fats,
+                                        fiber: selected.fiber
+                                    }))
+                                }
+                            }}
                         >
                             <option value="">Select from previously added food</option>
                             {data.map((food) => <option value={food.mealId} key={food.mealId}>

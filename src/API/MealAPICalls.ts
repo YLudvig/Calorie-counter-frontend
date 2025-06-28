@@ -105,3 +105,20 @@ export async function patchMealItem(mealItem: MealItem) {
     }
 }
 
+export async function getFoodFromFoodFactsAPI(searchTerm: string) {
+    try {
+        const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
+          searchTerm
+        )}&search_simple=1&action=process&json=1`);
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return [];
+    }
+}
+
