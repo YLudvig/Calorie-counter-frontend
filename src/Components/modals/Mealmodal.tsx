@@ -43,6 +43,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
     const [selectedMealId, setSelectedMealId] = useState<string>("");
 
+    const [selectedOFFMealId, setSelectedOFFMealId] = useState<string>("");
+
     const [searchTerm, setSearchTerm] = useState<string>("");
 
 
@@ -93,6 +95,24 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     }
 
     useEffect(() => {
+        if (selectedOFFMealId !== "") {
+            setSelectedMealId("");
+        }
+    }, [selectedOFFMealId]);
+
+    useEffect(() => {
+        if (selectedMealId !== "") {
+            setSelectedOFFMealId("");
+        }
+    }, [selectedMealId]);
+
+    useEffect(() => {
+        if (selectedMealId === "" && selectedOFFMealId === "") {
+            setInput(initialInput);
+        }
+    }, [selectedOFFMealId, selectedMealId]);
+
+    useEffect(() => {
         fetchMealsByUser(user.userId)
             .then(setData)
             .catch(console.error);
@@ -122,6 +142,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     function handleClose() {
         setInput(initialInput);
         setSelectedMealId("");
+        setSelectedOFFMealId("");
         setSearchTerm("");
         onClose();
     }
@@ -148,11 +169,11 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 <div className="mb-4 flex flex-col space-y-4 font-bold font-serif text-sm">
                     <form action="">
                         <select className="mt-2 p-2 border rounded w-full"
-                            value={selectedMealId}
+                            value={selectedOFFMealId}
 
                             onChange={(e) => {
                                 const id = e.target.value;
-                                setSelectedMealId(id);
+                                setSelectedOFFMealId(id);
 
                                 const selected = OFFdata.find(item => item._id === id);
                                 if (selected) {
@@ -169,7 +190,10 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                 }
                             }}
                         >
-                            <option value="">Select from food you searched for</option>
+
+                            <option value="">
+                                Select from food you searched for
+                            </option>
                             {OFFdata.map((food) => <option value={food._id} key={food._id}>
                                 {food.product_name}
                             </option>)}
@@ -196,7 +220,10 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                 }
                             }}
                         >
-                            <option value="">Select from previously added food</option>
+
+                            <option value="">
+                                Select from food you previously added
+                            </option>
                             {data.map((food) => <option value={food.mealId} key={food.mealId}>
                                 {food.name} ({food.date})
                             </option>)}
