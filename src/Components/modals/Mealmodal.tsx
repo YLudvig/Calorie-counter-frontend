@@ -122,12 +122,13 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     function handleClose() {
         setInput(initialInput);
         setSelectedMealId("");
+        setSearchTerm("");
         onClose();
     }
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/1 flex items-center justify-center z-50" onClick={handleOverlayClick}>
-            <div className="bg-white rounded-lg p-6 relative shadow-lg min-w-[300px] max-w-[50vw] w-full">
+            <div className="bg-white rounded-lg p-6 relative shadow-lg min-w-[300px] max-w-[35vw] w-full">
                 <button
                     onClick={handleClose}
                     className="absolute top-2 right-2 text-gray-500 hover:text-black"
