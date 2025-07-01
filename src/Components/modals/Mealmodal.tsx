@@ -59,9 +59,13 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     };
 
     const handleSubmit = async () => {
-        if (!input.name.trim() || !input.mealtype || !input.date) {
-            setFeedback({ message: 'Please fill in date, name and mealtype before submitting', type: 'error' })
-        } else {
+        if (!input.name.trim()) {
+            setFeedback({ message: 'Please fill in  name before submitting', type: 'error' })
+        } else if (!input.mealtype){
+            setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error'})
+        } else if (!input.date){
+            setFeedback({ message: 'Please fill in date before submitting', type: 'error'})
+        }else {
             try {
                 //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
                 // är dock fortfarande logiskt att skicka i gram för tillfället
@@ -157,13 +161,24 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                     ×
                 </button>
                 <form onSubmit={handleSubmitInputOFFAPI}>
-                    <input type="text"
-                        className="mt-2 p-2 border rounded w-full"
-                        placeholder="Search for food"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        required
-                    />
+                    <div className="relative mt-2">
+                        <input type="text"
+                            className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+                            placeholder=""
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            required
+                        />
+                        <label
+                            htmlFor="search-food"
+                            className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs text-gray-500 transition-all 
+                                       peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm 
+                                       peer-focus:-translate-y-2 peer-focus:text-xs peer-disabled:bg-transparent"
+                        >
+                            Search for food
+                        </label>
+
+                    </div>
                     <button type="submit" className="px-4 py-2 p-2 mt-2 bg-blue-500 text-white rounded hover:bg-blue-600">Search</button>
                 </form>
                 <div className="mb-4 flex flex-col space-y-4 font-bold font-serif text-sm">
@@ -228,83 +243,169 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                 {food.name} ({food.date})
                             </option>)}
                         </select>
-                        <label className="font-bold italic" htmlFor="meal-name">Name:</label>
-                        <input
-                            id="meal-name"
-                            type="text"
-                            placeholder="Enter item name"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
-                        />
-                        <label className="font-bold italic" htmlFor="meal-type">Meal type:</label>
-                        <select
-                            id="meal-type"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.mealtype}
-                            onChange={(e) => handleChange('mealtype', e.target.value)}
-                        >
-                            <option value="">Select meal type</option>
-                            {mealTypes.map((type) => (
-                                <option key={type} value={type}>
-                                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                                </option>
-                            ))}
-                        </select>
-                        <label className="font-bold italic" htmlFor="calories">Calories per 100g:</label>
-                        <input
-                            id="calories"
-                            type="number"
-                            placeholder="Enter amount of calories"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.calories}
-                            onChange={(e) => handleChange('calories', Number(e.target.value))}
-                        />
-                        <label className="font-bold italic" htmlFor="protein">Protein per 100g:</label>
-                        <input
-                            id="protein"
-                            type="number"
-                            placeholder="Enter amount of protein"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.protein}
-                            onChange={(e) => handleChange('protein', Number(e.target.value))}
-                        />
-                        <label className="font-bold italic" htmlFor="carbs">Carbs per 100g:</label>
-                        <input
-                            id="carbs"
-                            type="number"
-                            placeholder="Enter amount of carbs"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.carbs}
-                            onChange={(e) => handleChange('carbs', Number(e.target.value))}
-                        />
-                        <label className="font-bold italic" htmlFor="fat">Fat per 100g:</label>
-                        <input
-                            id="fat"
-                            type="number"
-                            placeholder="Enter amount of fat"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.fats}
-                            onChange={(e) => handleChange('fats', Number(e.target.value))}
-                        />
-                        <label className="font-bold italic" htmlFor="fiber">Fiber per 100g:</label>
-                        <input
-                            id="fiber"
-                            type="number"
-                            placeholder="Enter amount of fiber"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.fiber}
-                            onChange={(e) => handleChange('fiber', Number(e.target.value))}
-                        />
-                        <label className="font-bold italic" htmlFor="weight">Weight (g):</label>
-                        <input
-                            id="weight"
-                            type="number"
-                            placeholder="Enter weight in grams"
-                            className="mt-2 p-2 border rounded w-full"
-                            value={input.weight}
-                            onChange={(e) => handleChange('weight', Number(e.target.value))}
-                        />
+                        <div className="relative mt-6">
+                            <input
+                                id="meal-name"
+                                type="text"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.name}
+                                onChange={(e) => handleChange('name', e.target.value)}
+                                required
+                            />
+                            <label
+                                htmlFor="meal-name"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Name:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-4">
+                            <select
+                                id="meal-type"
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+                                value={input.mealtype}
+                                onChange={(e) => handleChange('mealtype', e.target.value)}
+                            >
+                                <option value="">Select meal</option>
+                                {mealTypes.map(type => (
+                                    <option key={type} value={type}>
+                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                            <label
+                                htmlFor="meal-type"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs peer-disabled:bg-transparent"
+                            >
+                                Meal
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="calories"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.calories}
+                                onChange={(e) => handleChange('calories', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="calories"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Calories per 100g:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="protein"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.protein}
+                                onChange={(e) => handleChange('protein', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="protein"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Protein per 100g:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="carbs"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.carbs}
+                                onChange={(e) => handleChange('carbs', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="carbs"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Carbs per 100g:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="fat"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.fats}
+                                onChange={(e) => handleChange('fats', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="fat"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Fat per 100g:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="fiber"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.fiber}
+                                onChange={(e) => handleChange('fiber', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="fiber"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Fiber per 100g:
+                            </label>
+                        </div>
+
+                        <div className="relative mt-6">
+                            <input
+                                id="weight"
+                                type="number"
+                                placeholder=" "
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={input.weight}
+                                onChange={(e) => handleChange('weight', Number(e.target.value))}
+                                required
+                            />
+                            <label
+                                htmlFor="weight"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                           peer-focus:-translate-y-2 peer-focus:text-xs"
+                            >
+                                Weight (g):
+                            </label>
+                        </div>
                     </form>
                     {feedback.type === 'success' && (
                         <div className="mt-2 p-2 bg-green-100 text-green-800 rounded text-center font-semibold">

@@ -88,7 +88,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
             <div className="flex-grow p-6 overflow-auto rounded-lg flex flex-col items-center">
                 <button
                     onClick={openModal}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 transition duration-300 ease-in-out"
                 >
                     Add food
                 </button>
@@ -138,7 +138,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                             </td>
                                         </tr>
                                         {items.map(item => (
-                                            <tr key={item.mealId} className="border bg-gray-100">
+                                            <tr key={item.mealId} className="border bg-gray-100 hover:bg-gray-200 transition duration-300 ease-in-out">
                                                 <td className="border px-4 py-2">{item.name}
                                                     <div className="flex justify-between items-center overflow-x-auto whitespace-nowrap">
                                                         <button className="text-red-500 pl-2" onClick={() => { if (item.mealId) deleteMealItemById(item.mealId, user.userId) }}>[X]</button>
@@ -189,15 +189,16 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                             </button>
                                                         </>
                                                     )}
-                                                </td>                                                <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
+                                                </td>                                                
+                                                <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
                                                 <td className="border px-4 py-2 text-center">{(item.protein * item.weight).toFixed(0)}g protein</td>
                                                 <td className="border px-4 py-2 text-center">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
                                                 <td className="border px-4 py-2 text-center">{(item.fats * item.weight).toFixed(0)}g fats</td>
                                                 <td className="border px-4 py-2 text-center">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
                                             </tr>
                                         ))}
-                                        <tr className="border bg-gray-200 font-bold">
-                                            <td className="border px-4 py-2 text-center" colSpan={2}>Total {type}</td>
+                                        <tr className="border bg-gray-200">
+                                            <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Total {type}</td>
                                             <td className="border px-4 py-2 text-center">{typeTotals.calories.toFixed(0)} kcal</td>
                                             <td className="border px-4 py-2 text-center">{typeTotals.protein.toFixed(0)}g protein</td>
                                             <td className="border px-4 py-2 text-center">{typeTotals.carbs.toFixed(0)}g carbs</td>
@@ -207,8 +208,8 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                     </React.Fragment>
                                 );
                             })}
-                            <tr className="border bg-gray-300 font-bold">
-                                <td className="border px-4 py-2 text-center" colSpan={2}>Daily total</td>
+                            <tr className="border bg-gray-300">
+                                <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
                                 <td className="border px-4 py-2 text-center">{dailyTotals.calories.toFixed(0)} kcal</td>
                                 <td className="border px-4 py-2 text-center">{dailyTotals.protein.toFixed(0)}g protein</td>
                                 <td className="border px-4 py-2 text-center">{dailyTotals.carbs.toFixed(0)}g carbs</td>
