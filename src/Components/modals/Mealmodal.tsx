@@ -88,13 +88,28 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
     };
 
+    const filterOFFDataByCountry = (productlist: OFFMealItem[], countries: string[]) => {
+        return productlist.filter((product) => {
+            if (!product.countries) return false;
+            
+            // Normalize for consistent comparison
+            const productCountries = product.countries.toLowerCase();
+            return countries.some(country =>
+            productCountries.includes(country.toLowerCase())
+            );
+        });
+    };
+    
+    const relevantCountries = ["Sweden", "Denmark", "Finland", "Sverige", "Tyskland", "Untied States", "United Kingdom"];
+    
     const handleSubmitInputOFFAPI = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (searchTerm != null) {
-            getFoodFromFoodFactsAPI(searchTerm)
-                .then(data => setOFFdata(data.products || []))
-                .catch(console.error);
-            console.log(OFFdata);
+            if (searchTerm != null) {
+                getFoodFromFoodFactsAPI(searchTerm)
+                    .then(data => filterOFFDataByCountry(data.products || [], relevantCountries))
+                    .then(filtered => setOFFdata(filtered))
+                    .catch(console.error);
+                console.log(OFFdata);
         }
     }
 

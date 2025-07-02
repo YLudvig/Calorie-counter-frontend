@@ -16,6 +16,7 @@ export interface MealItem {
 
 export interface OFFMealItem {
     _id: string;
+    countries?: string;
     product_name: string;
     nutriments?: {
     ["energy-kcal_100g"]?: number;
