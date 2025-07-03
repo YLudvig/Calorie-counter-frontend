@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Mealmodal, { mealTypes } from '../modals/Mealmodal';
-import { deleteMealItem, fetchMealsByUserAndDate, getDailyTotals, patchMealItem } from '../../API/MealAPICalls';
-import type { DailyTotal, MealItem } from '../../types/mealtypes';
+import { deleteMealItem, fetchMealsByUserAndDate, getDailyTotals, getTypeTotals, patchMealItem } from '../../API/MealAPICalls';
+import type { DailyTotal, MealItem, TypeTotal } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -26,6 +26,9 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
 
     //State som har datan vi hämtar från backend
     const [dailyData, setDailyData] = useState<DailyTotal>();
+
+    //State som har datan vi hämtar från backend
+    const [typeData, setTypeData] = useState<TypeTotal[]>([]);
 
     //State som håller koll på valt datum i select och som vi sedan använder för att fetcha 
     //från backend och att köra om vår useEffect för att förbli uppdaterad
@@ -52,6 +55,10 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         getDailyTotals(user.userId, selectedDate)
             .then(setDailyData)
             .catch(console.error);
+        getTypeTotals(user.userId, selectedDate) 
+            .then(setTypeData) 
+            .catch(console.error)
+        console.log(typeData)
     }, [mealModalCount, selectedDate]);
 
     //Funktion för att deleta item
@@ -73,19 +80,6 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         //För att trigga rerender efter tas bort 
         setMealModalCount(prev => prev + 1);
     }
-
-    //Räknar ihop summan för dagens intag av macros
-    /* const dailyTotals = data.reduce(
-        (acc, item) => ({
-            calories: acc.calories + item.calories * item.weight,
-            protein: acc.protein + item.protein * item.weight,
-            carbs: acc.carbs + item.carbs * item.weight,
-            fats: acc.fats + item.fats * item.weight,
-            fiber: acc.fiber + item.fiber * item.weight,
-            weight: acc.weight + item.weight,
-        }),
-        { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0, weight: 0 }
-    ); */
 
     return (
         <div className="flex h-screen w-screen">
@@ -124,18 +118,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     <table className="min-w-full table-fixed border border-gray-400 text-sm">
                         <tbody>
                             {mealTypes.map(type => {
+                                const typeTotals = typeData.find(item => item.mealType === type);
+                                
                                 const items = data.filter(item => item.mealtype === type);
+
                                 if (items.length === 0) return null;
-                                const typeTotals = items.reduce(
-                                    (acc, item) => ({
-                                        calories: acc.calories + item.calories * item.weight,
-                                        protein: acc.protein + item.protein * item.weight,
-                                        carbs: acc.carbs + item.carbs * item.weight,
-                                        fats: acc.fats + item.fats * item.weight,
-                                        fiber: acc.fiber + item.fiber * item.weight,
-                                    }),
-                                    { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }
-                                );
+
                                 return (
                                     <React.Fragment key={type}>
                                         <tr>
@@ -205,11 +193,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                         ))}
                                         <tr className="border bg-gray-200">
                                             <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Total {type}</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals.calories.toFixed(0)} kcal</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals.protein.toFixed(0)}g protein</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals.carbs.toFixed(0)}g carbs</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals.fats.toFixed(0)}g fats</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals.fiber.toFixed(0)}g fiber</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalCalories?.toFixed(0)} kcal</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalProtein?.toFixed(0)}g protein</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalCarbs?.toFixed(0)}g carbs</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalFats?.toFixed(0)}g fats</td>
+                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalFiber?.toFixed(0)}g fiber</td>
                                         </tr>
                                     </React.Fragment>
                                 );

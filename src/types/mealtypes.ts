@@ -22,6 +22,15 @@ export interface DailyTotal {
     sumprotein: number; 
 }
 
+export interface TypeTotal {
+    mealType: string; 
+    totalCalories: number; 
+    totalCarbs: number; 
+    totalFats: number; 
+    totalFiber: number; 
+    totalProtein: number; 
+}
+
 export interface OFFMealItem {
     _id: string;
     countries?: string;
