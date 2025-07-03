@@ -122,3 +122,19 @@ export async function getFoodFromFoodFactsAPI(searchTerm: string) {
     }
 }
 
+//Denna nyttjas för att populera tabellen med dagens inputade mat för användaren 
+export async function getDailyTotals(userId: string, date: string) {
+    try {
+        const response = await fetchApi(
+            `/meal/getDailyTotal?userId=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return [];
+    }
+}
+

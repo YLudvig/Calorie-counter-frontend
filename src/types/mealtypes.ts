@@ -14,6 +14,14 @@ export interface MealItem {
     fiber: number;
 }
 
+export interface DailyTotal {
+    sumcalories: number; 
+    sumcarbs: number; 
+    sumfats: number; 
+    sumfiber: number; 
+    sumprotein: number; 
+}
+
 export interface OFFMealItem {
     _id: string;
     countries?: string;

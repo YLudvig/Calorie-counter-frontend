@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Mealmodal, { mealTypes } from '../modals/Mealmodal';
-import { deleteMealItem, fetchMealsByUserAndDate, patchMealItem } from '../../API/MealAPICalls';
-import type { MealItem } from '../../types/mealtypes';
+import { deleteMealItem, fetchMealsByUserAndDate, getDailyTotals, patchMealItem } from '../../API/MealAPICalls';
+import type { DailyTotal, MealItem } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,6 +23,9 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
 
     //State som har datan vi hämtar från backend
     const [data, setData] = useState<MealItem[]>([]);
+
+    //State som har datan vi hämtar från backend
+    const [dailyData, setDailyData] = useState<DailyTotal>();
 
     //State som håller koll på valt datum i select och som vi sedan använder för att fetcha 
     //från backend och att köra om vår useEffect för att förbli uppdaterad
@@ -46,6 +49,9 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         fetchMealsByUserAndDate(user.userId, selectedDate)
             .then(setData)
             .catch(console.error); 
+        getDailyTotals(user.userId, selectedDate)
+            .then(setDailyData)
+            .catch(console.error);
     }, [mealModalCount, selectedDate]);
 
     //Funktion för att deleta item
@@ -69,7 +75,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     }
 
     //Räknar ihop summan för dagens intag av macros
-    const dailyTotals = data.reduce(
+    /* const dailyTotals = data.reduce(
         (acc, item) => ({
             calories: acc.calories + item.calories * item.weight,
             protein: acc.protein + item.protein * item.weight,
@@ -79,7 +85,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
             weight: acc.weight + item.weight,
         }),
         { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0, weight: 0 }
-    );
+    ); */
 
     return (
         <div className="flex h-screen w-screen">
@@ -208,14 +214,16 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                     </React.Fragment>
                                 );
                             })}
-                            <tr className="border bg-gray-300">
-                                <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
-                                <td className="border px-4 py-2 text-center">{dailyTotals.calories.toFixed(0)} kcal</td>
-                                <td className="border px-4 py-2 text-center">{dailyTotals.protein.toFixed(0)}g protein</td>
-                                <td className="border px-4 py-2 text-center">{dailyTotals.carbs.toFixed(0)}g carbs</td>
-                                <td className="border px-4 py-2 text-center">{dailyTotals.fats.toFixed(0)}g fats</td>
-                                <td className="border px-4 py-2 text-center">{dailyTotals.fiber.toFixed(0)}g fiber</td>
-                            </tr>
+                            {dailyData && (
+                                <tr className="border bg-gray-300">
+                                    <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
+                                    <td className="border px-4 py-2 text-center">{dailyData.sumcalories.toFixed(0)} kcal</td>
+                                    <td className="border px-4 py-2 text-center">{dailyData.sumprotein.toFixed(0)}g protein</td>
+                                    <td className="border px-4 py-2 text-center">{dailyData.sumcarbs.toFixed(0)}g carbs</td>
+                                    <td className="border px-4 py-2 text-center">{dailyData.sumfats.toFixed(0)}g fats</td>
+                                    <td className="border px-4 py-2 text-center">{dailyData.sumfiber.toFixed(0)}g fiber</td>
+                                </tr>
+                            )}
                             {data.length === 0 && (
                                 <tr>
                                     <td colSpan={8} className="border px-4 py-2 text-center">
