@@ -6,7 +6,7 @@ import type { User } from "../../types/AuthTypes";
 type SidebarProps = {
   user: User;
   setUser: (user: User | null) => void;
-}
+};
 
 export default function Sidebar({ user, setUser }: SidebarProps) {
   const location = useLocation();
@@ -23,49 +23,71 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
   }
 
   return (
-    <div className="flex flex-col justify-between h-screen p-2 w-[220px]">
+    <div className="flex flex-col justify-between h-screen w-[220px] p-4 bg-white border-r border-blue-100 shadow-sm">
       <div>
-        <div className="text-2xl mb-4 font-semibold">Calcounter</div>
-        <div className="flex flex-col">
+        <div className="text-2xl font-bold text-blue-700 mb-6">Calcounter</div>
+        <nav className="flex flex-col space-y-2">
           <Link
             to="/calcounter"
-            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/calcounter" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === "/calcounter"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               }`}
           >
             Food diary
           </Link>
-          {/* Statistics är ej skapad ännu */}
           <Link
             to="/statistics"
-            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/statistics" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === "/statistics"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               }`}
           >
             Statistics
           </Link>
           <Link
             to="/weighttracking"
-            className={`block mb-2 rounded px-3 py-2 no-underline ${currentPath === "/weighttracking" ? "bg-blue-400 text-white" : "hover:bg-gray-100"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === "/weighttracking"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               }`}
           >
-            WeightTracking
+            Weight Tracking
           </Link>
-        </div>
+        </nav>
       </div>
 
-      <div className="border-t border-gray-600 pt-3">
-        <div className="flex items-center gap-2 text-sm mb-2">
-          <FaUserCircle size={24} />
-          <h3 className="truncate">{userName}</h3>
+      <div className="pt-4 border-t border-blue-100 mt-6">
+        <div className="flex items-center gap-2 text-sm text-gray-700 mb-3 pl-1">
+          <FaUserCircle size={20} className="text-blue-600" />
+          <span className="truncate">{userName}</span>
         </div>
-        <div>
-          <a
-            href="/"
-            onClick={handleLogout}
-            className="text-indigo-500 text-base hover:underline"
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-white px-4 py-2 text-sm text-blue-700 font-medium shadow-sm 
+          hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-100"
+        >
+          Logga ut
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
           >
-            Logga ut
-          </a>
-        </div>
+            <path
+              fillRule="evenodd"
+              d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 
+              0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z"
+              clipRule="evenodd"
+            />
+            <path
+              fillRule="evenodd"
+              d="M6 10a.75.75 0 01.75-.75h9.546l-1.048-.943a.75.75 0 111.004-1.114l2.5 2.25a.75.75 0 010 1.114l-2.5 2.25a.75.75 0 11-1.004-1.114l1.048-.943H6.75A.75.75 0 016 10z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );

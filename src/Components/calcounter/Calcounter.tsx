@@ -51,12 +51,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     useEffect(() => {
         fetchMealsByUserAndDate(user.userId, selectedDate)
             .then(setData)
-            .catch(console.error); 
+            .catch(console.error);
         getDailyTotals(user.userId, selectedDate)
             .then(setDailyData)
             .catch(console.error);
-        getTypeTotals(user.userId, selectedDate) 
-            .then(setTypeData) 
+        getTypeTotals(user.userId, selectedDate)
+            .then(setTypeData)
             .catch(console.error)
         console.log(typeData)
     }, [mealModalCount, selectedDate]);
@@ -114,12 +114,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-sm border border-gray-300">
-                    <table className="min-w-full table-fixed border border-gray-400 text-sm">
+                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm">
+                    <table className="min-w-full table-fixed border border-blue-100 text-sm">
                         <tbody>
                             {mealTypes.map(type => {
                                 const typeTotals = typeData.find(item => item.mealType === type);
-                                
+
                                 const items = data.filter(item => item.mealtype === type);
 
                                 if (items.length === 0) return null;
@@ -183,7 +183,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                             </button>
                                                         </>
                                                     )}
-                                                </td>                                                
+                                                </td>
                                                 <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
                                                 <td className="border px-4 py-2 text-center">{(item.protein * item.weight).toFixed(0)}g protein</td>
                                                 <td className="border px-4 py-2 text-center">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
@@ -193,11 +193,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                         ))}
                                         <tr className="border bg-gray-200">
                                             <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Total {type}</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalCalories?.toFixed(0)} kcal</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalProtein?.toFixed(0)}g protein</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalCarbs?.toFixed(0)}g carbs</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalFats?.toFixed(0)}g fats</td>
-                                            <td className="border px-4 py-2 text-center">{typeTotals?.totalFiber?.toFixed(0)}g fiber</td>
+                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCalories ?? 0).toFixed(0)} kcal</td>
+                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalProtein ?? 0).toFixed(0)}g protein</td>
+                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCarbs ?? 0).toFixed(0)}g carbs</td>
+                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFats ?? 0)?.toFixed(0)}g fats</td>
+                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFiber ?? 0).toFixed(0)}g fiber</td>
                                         </tr>
                                     </React.Fragment>
                                 );
@@ -205,11 +205,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                             {dailyData && (
                                 <tr className="border bg-gray-300">
                                     <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
-                                    <td className="border px-4 py-2 text-center">{dailyData.sumcalories.toFixed(0)} kcal</td>
-                                    <td className="border px-4 py-2 text-center">{dailyData.sumprotein.toFixed(0)}g protein</td>
-                                    <td className="border px-4 py-2 text-center">{dailyData.sumcarbs.toFixed(0)}g carbs</td>
-                                    <td className="border px-4 py-2 text-center">{dailyData.sumfats.toFixed(0)}g fats</td>
-                                    <td className="border px-4 py-2 text-center">{dailyData.sumfiber.toFixed(0)}g fiber</td>
+                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcalories ?? 0).toFixed(0)} kcal</td>
+                                    <td className="border px-4 py-2 text-center">{(dailyData.sumprotein ?? 0).toFixed(0)}g protein</td>
+                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcarbs ?? 0).toFixed(0)}g carbs</td>
+                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfats ?? 0).toFixed(0)}g fats</td>
+                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfiber ?? 0).toFixed(0)}g fiber</td>
                                 </tr>
                             )}
                             {data.length === 0 && (
