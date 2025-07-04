@@ -61,11 +61,11 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     const handleSubmit = async () => {
         if (!input.name.trim()) {
             setFeedback({ message: 'Please fill in  name before submitting', type: 'error' })
-        } else if (!input.mealtype){
-            setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error'})
-        } else if (!input.date){
-            setFeedback({ message: 'Please fill in date before submitting', type: 'error'})
-        }else {
+        } else if (!input.mealtype) {
+            setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error' })
+        } else if (!input.date) {
+            setFeedback({ message: 'Please fill in date before submitting', type: 'error' })
+        } else {
             try {
                 //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
                 // är dock fortfarande logiskt att skicka i gram för tillfället
@@ -91,25 +91,25 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     const filterOFFDataByCountry = (productlist: OFFMealItem[], countries: string[]) => {
         return productlist.filter((product) => {
             if (!product.countries) return false;
-            
+
             // Normalize for consistent comparison
             const productCountries = product.countries.toLowerCase();
             return countries.some(country =>
-            productCountries.includes(country.toLowerCase())
+                productCountries.includes(country.toLowerCase())
             );
         });
     };
-    
+
     const relevantCountries = ["Sweden", "Denmark", "Finland", "Sverige", "Tyskland", "Untied States", "United Kingdom"];
-    
+
     const handleSubmitInputOFFAPI = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-            if (searchTerm != null) {
-                getFoodFromFoodFactsAPI(searchTerm)
-                    .then(data => filterOFFDataByCountry(data.products || [], relevantCountries))
-                    .then(filtered => setOFFdata(filtered))
-                    .catch(console.error);
-                console.log(OFFdata);
+        if (searchTerm != null) {
+            getFoodFromFoodFactsAPI(searchTerm)
+                .then(data => filterOFFDataByCountry(data.products || [], relevantCountries))
+                .then(filtered => setOFFdata(filtered))
+                .catch(console.error);
+            console.log(OFFdata);
         }
     }
 
@@ -303,124 +303,37 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                             </label>
                         </div>
 
-                        <div className="relative mt-6">
-                            <input
-                                id="calories"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.calories}
-                                onChange={(e) => handleChange('calories', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="calories"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Calories per 100g:
-                            </label>
-                        </div>
-
-                        <div className="relative mt-6">
-                            <input
-                                id="protein"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.protein}
-                                onChange={(e) => handleChange('protein', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="protein"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Protein per 100g:
-                            </label>
-                        </div>
-
-                        <div className="relative mt-6">
-                            <input
-                                id="carbs"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.carbs}
-                                onChange={(e) => handleChange('carbs', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="carbs"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Carbs per 100g:
-                            </label>
-                        </div>
-
-                        <div className="relative mt-6">
-                            <input
-                                id="fat"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.fats}
-                                onChange={(e) => handleChange('fats', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="fat"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Fat per 100g:
-                            </label>
-                        </div>
-
-                        <div className="relative mt-6">
-                            <input
-                                id="fiber"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.fiber}
-                                onChange={(e) => handleChange('fiber', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="fiber"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Fiber per 100g:
-                            </label>
-                        </div>
-
-                        <div className="relative mt-6">
-                            <input
-                                id="weight"
-                                type="number"
-                                placeholder=" "
-                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                value={input.weight}
-                                onChange={(e) => handleChange('weight', Number(e.target.value))}
-                                required
-                            />
-                            <label
-                                htmlFor="weight"
-                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                           peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                           peer-focus:-translate-y-2 peer-focus:text-xs"
-                            >
-                                Weight (g):
-                            </label>
+                        <div className="grid grid-cols-12 gap-4 mt-6">
+                            {[
+                                { label: 'Calories (kcal)', field: 'calories' },
+                                { label: 'Protein (g)', field: 'protein' },
+                                { label: 'Carbs (g)', field: 'carbs' },
+                                { label: 'Fats (g)', field: 'fats' },
+                                { label: 'Fiber (g)', field: 'fiber' },
+                                { label: 'Weight (g)', field: 'weight' }
+                            ].map(({ label, field }) => (
+                                <div key={field} className="col-span-6 relative">
+                                    <input
+                                        id={field}
+                                        type="number"
+                                        placeholder=" "
+                                        className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                        value={input[field as keyof MealItem] as number}
+                                        onChange={(e) =>
+                                            handleChange(field as keyof MealItem, Number(e.target.value))
+                                        }
+                                        required
+                                    />
+                                    <label
+                                        htmlFor={field}
+                                        className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                    peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                    peer-focus:-translate-y-2 peer-focus:text-xs"
+                                    >
+                                        {label}
+                                    </label>
+                                </div>
+                            ))}
                         </div>
                     </form>
                     {feedback.type === 'success' && (
