@@ -109,13 +109,45 @@ export async function getFoodFromFoodFactsAPI(searchTerm: string) {
     try {
         const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
           searchTerm
-        )}&fields=product_name,countries,nutriments,brands,code&json=1`);
+        )}&fields=product_name,_id,countries,nutriments,brands,code&json=1`);
         if (!response.ok) {
             throw new Error('Problem med nätverksresponsen');
         }
         const data = await response.json();
         console.log(data);
         return data;
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return [];
+    }
+}
+
+//Denna nyttjas för att populera tabellen med dagens inputade mat för användaren 
+export async function getDailyTotals(userId: string, date: string) {
+    try {
+        const response = await fetchApi(
+            `/meal/getDailyTotal?userId=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return [];
+    }
+}
+
+//Denna nyttjas för att populera tabellen med dagens inputade mat för användaren 
+export async function getTypeTotals(userId: string, date: string) {
+    try {
+        const response = await fetchApi(
+            `/meal/getTypeTotals?userId=${encodeURIComponent(userId)}&date=${encodeURIComponent(date)}`
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return await response.json();
     } catch (error) {
         console.error('Det blev ett problem med fetchen', error);
         return [];

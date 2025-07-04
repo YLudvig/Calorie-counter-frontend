@@ -163,6 +163,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         setSelectedMealId("");
         setSelectedOFFMealId("");
         setSearchTerm("");
+        setOFFdata([]);
         onClose();
     }
 
