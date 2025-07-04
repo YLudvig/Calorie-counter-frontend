@@ -114,12 +114,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm">
-                    <table className="min-w-full table-fixed border border-blue-100 text-sm">
+                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[800px]">
+                    <table className="min-w-full table-fixed text-sm border-collapse">
                         <tbody>
                             {mealTypes.map(type => {
                                 const typeTotals = typeData.find(item => item.mealType === type);
-
                                 const items = data.filter(item => item.mealtype === type);
 
                                 if (items.length === 0) return null;
@@ -127,18 +126,32 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                 return (
                                     <React.Fragment key={type}>
                                         <tr>
-                                            <td colSpan={7} className="border bg-gray-200 font-bold px-4 py-2 capitalize text-center">
+                                            <td
+                                                colSpan={7}
+                                                className="border border-gray-200 bg-gray-100 font-bold px-4 py-2 capitalize text-center"
+                                            >
                                                 {type}
                                             </td>
                                         </tr>
                                         {items.map(item => (
-                                            <tr key={item.mealId} className="border bg-gray-100 hover:bg-gray-200 transition duration-300 ease-in-out">
-                                                <td className="border px-4 py-2">{item.name}
+                                            <tr
+                                                key={item.mealId}
+                                                className="border border-gray-200 bg-white hover:bg-gray-50 transition duration-200"
+                                            >
+                                                <td className="border border-gray-200 px-4 py-2">
+                                                    {item.name}
                                                     <div className="flex justify-between items-center overflow-x-auto whitespace-nowrap">
-                                                        <button className="text-red-500 pl-2" onClick={() => { if (item.mealId) deleteMealItemById(item.mealId, user.userId) }}>[X]</button>
+                                                        <button
+                                                            className="text-red-500 pl-2"
+                                                            onClick={() => {
+                                                                if (item.mealId) deleteMealItemById(item.mealId, user.userId);
+                                                            }}
+                                                        >
+                                                            [X]
+                                                        </button>
                                                     </div>
                                                 </td>
-                                                <td className="border px-4 py-2 text-center">
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
                                                     {editingMealId === item.mealId ? (
                                                         <form
                                                             onSubmit={(e) => {
@@ -146,7 +159,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                                 if (item.mealId && editedWeight) {
                                                                     const updatedItem = {
                                                                         ...item,
-                                                                        weight: parseFloat(editedWeight) / 100, // divide by 100 to convert from g to portion
+                                                                        weight: parseFloat(editedWeight) / 100,
                                                                     };
                                                                     patchMealItemById(updatedItem);
                                                                     setEditingMealId(null);
@@ -184,37 +197,73 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                         </>
                                                     )}
                                                 </td>
-                                                <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
-                                                <td className="border px-4 py-2 text-center">{(item.protein * item.weight).toFixed(0)}g protein</td>
-                                                <td className="border px-4 py-2 text-center">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
-                                                <td className="border px-4 py-2 text-center">{(item.fats * item.weight).toFixed(0)}g fats</td>
-                                                <td className="border px-4 py-2 text-center">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.calories * item.weight).toFixed(0)} kcal
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.protein * item.weight).toFixed(0)}g protein
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.carbs * item.weight).toFixed(0)}g carbs
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.fats * item.weight).toFixed(0)}g fats
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.fiber * item.weight).toFixed(0)}g fiber
+                                                </td>
                                             </tr>
                                         ))}
-                                        <tr className="border bg-gray-200">
-                                            <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Total {type}</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCalories ?? 0).toFixed(0)} kcal</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalProtein ?? 0).toFixed(0)}g protein</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCarbs ?? 0).toFixed(0)}g carbs</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFats ?? 0)?.toFixed(0)}g fats</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFiber ?? 0).toFixed(0)}g fiber</td>
+                                        <tr className="bg-gray-100 border border-gray-200">
+                                            <td className="border border-gray-200 px-4 py-2 text-center font-bold" colSpan={2}>
+                                                Total {type}
+                                            </td>
+                                            <td className="border border-gray-200 px-4 py-2 text-center">
+                                                {(typeTotals?.totalCalories ?? 0).toFixed(0)} kcal
+                                            </td>
+                                            <td className="border border-gray-200 px-4 py-2 text-center">
+                                                {(typeTotals?.totalProtein ?? 0).toFixed(0)}g protein
+                                            </td>
+                                            <td className="border border-gray-200 px-4 py-2 text-center">
+                                                {(typeTotals?.totalCarbs ?? 0).toFixed(0)}g carbs
+                                            </td>
+                                            <td className="border border-gray-200 px-4 py-2 text-center">
+                                                {(typeTotals?.totalFats ?? 0)?.toFixed(0)}g fats
+                                            </td>
+                                            <td className="border border-gray-200 px-4 py-2 text-center">
+                                                {(typeTotals?.totalFiber ?? 0).toFixed(0)}g fiber
+                                            </td>
                                         </tr>
                                     </React.Fragment>
                                 );
                             })}
+
                             {dailyData && (
-                                <tr className="border bg-gray-300">
-                                    <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcalories ?? 0).toFixed(0)} kcal</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumprotein ?? 0).toFixed(0)}g protein</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcarbs ?? 0).toFixed(0)}g carbs</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfats ?? 0).toFixed(0)}g fats</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfiber ?? 0).toFixed(0)}g fiber</td>
+                                <tr className="bg-gray-200 border border-gray-200">
+                                    <td className="border border-gray-200 px-4 py-2 text-center font-bold" colSpan={2}>
+                                        Daily total
+                                    </td>
+                                    <td className="border border-gray-200 px-4 py-2 text-center">
+                                        {(dailyData.sumcalories ?? 0).toFixed(0)} kcal
+                                    </td>
+                                    <td className="border border-gray-200 px-4 py-2 text-center">
+                                        {(dailyData.sumprotein ?? 0).toFixed(0)}g protein
+                                    </td>
+                                    <td className="border border-gray-200 px-4 py-2 text-center">
+                                        {(dailyData.sumcarbs ?? 0).toFixed(0)}g carbs
+                                    </td>
+                                    <td className="border border-gray-200 px-4 py-2 text-center">
+                                        {(dailyData.sumfats ?? 0).toFixed(0)}g fats
+                                    </td>
+                                    <td className="border border-gray-200 px-4 py-2 text-center">
+                                        {(dailyData.sumfiber ?? 0).toFixed(0)}g fiber
+                                    </td>
                                 </tr>
                             )}
+
                             {data.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} className="border px-4 py-2 text-center">
+                                    <td colSpan={8} className="border border-gray-200 px-4 py-2 text-center text-gray-500">
                                         No meals added for this day
                                     </td>
                                 </tr>
