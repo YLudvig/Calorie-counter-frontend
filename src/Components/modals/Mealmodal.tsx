@@ -19,6 +19,12 @@ export const mealTypes: MealType[] = [
     'Evening snack'
 ];
 
+export const amount = [
+    'ml',
+    'g',
+    'piece'
+]
+
 export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDate }: MealModalProps) {
     const initialInput: MealItem = {
         userId: user.userId,
@@ -47,6 +53,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
 
     const [searchTerm, setSearchTerm] = useState<string>("");
 
+    const [selectedUnit, setSelectedUnit] = useState<string>("g");
+
 
     const handleChange = <K extends keyof MealItem>(
         field: K,
@@ -65,13 +73,13 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
             setFeedback({ message: 'Please fill in name and mealtype before submitting', type: 'error' })
         } else if (!input.name.trim() && !input.weight) {
             setFeedback({ message: 'Please fill in name and weight before submitting', type: 'error' })
-        }else if (!input.name.trim()) {
+        } else if (!input.name.trim()) {
             setFeedback({ message: 'Please fill in name before submitting', type: 'error' })
-        }else if (!input.weight && !input.mealtype) {
+        } else if (!input.weight && !input.mealtype) {
             setFeedback({ message: 'Please fill in mealtype and weight before submitting', type: 'error' })
-        }else if (!input.weight) {
+        } else if (!input.weight) {
             setFeedback({ message: 'Please fill in weight before submitting', type: 'error' })
-        }else if (!input.mealtype) {
+        } else if (!input.mealtype) {
             setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error' })
         } else {
             try {
@@ -79,7 +87,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 // är dock fortfarande logiskt att skicka i gram för tillfället
                 const weightAdjustedInput = {
                     ...input,
-                    weight: input.weight / 100,
+                    weight: selectedUnit === 'piece' ? input.weight : input.weight / 100,
                     userId: user.userId,
                     date: selectedDate,
                 };
@@ -310,6 +318,30 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                             </label>
                         </div>
 
+                        <div className="relative mt-4">
+                            <select
+                                id="unit-selector"
+                                className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                value={selectedUnit}
+                                onChange={(e) => setSelectedUnit(e.target.value)}
+                            >
+                                {amount.map(unit => (
+                                    <option key={unit} value={unit}>
+                                        {unit}
+                                    </option>
+                                ))}
+                            </select>
+                            <label
+                                htmlFor="unit-selector"
+                                className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs text-gray-500 transition-all
+                                            peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                            peer-focus:-translate-y-2 peer-focus:text-xs peer-disabled:bg-transparent"
+                            >
+                                Unit
+                            </label>
+                        </div>
+
+
                         <div className="grid grid-cols-12 gap-4 mt-6">
                             {[
                                 { label: 'Calories (kcal)', field: 'calories' },
@@ -317,30 +349,44 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                 { label: 'Carbs (g)', field: 'carbs' },
                                 { label: 'Fats (g)', field: 'fats' },
                                 { label: 'Fiber (g)', field: 'fiber' },
-                                { label: 'Weight (g)', field: 'weight' }
-                            ].map(({ label, field }) => (
-                                <div key={field} className="col-span-6 relative">
-                                    <input
-                                        id={field}
-                                        type="number"
-                                        placeholder=" "
-                                        className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                        value={input[field as keyof MealItem] as number}
-                                        onChange={(e) =>
-                                            handleChange(field as keyof MealItem, Number(e.target.value))
-                                        }
-                                        required
-                                    />
-                                    <label
-                                        htmlFor={field}
-                                        className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                                                    peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                                                    peer-focus:-translate-y-2 peer-focus:text-xs"
-                                    >
-                                        {label}
-                                    </label>
-                                </div>
-                            ))}
+                                { label: 'Weight', field: 'weight' } // Base label will be replaced below
+                            ].map(({ label, field }) => {
+                                // Dynamically adjust the label for weight based on selectedUnit
+                                if (field === 'weight') {
+                                    label =
+                                        selectedUnit === 'g'
+                                            ? 'Weight (g)'
+                                            : selectedUnit === 'ml'
+                                                ? 'Volume (ml)'
+                                                : selectedUnit === 'piece'
+                                                    ? 'Piece'
+                                                    : 'Weight';
+                                }
+
+                                return (
+                                    <div key={field} className="col-span-6 relative">
+                                        <input
+                                            id={field}
+                                            type="number"
+                                            placeholder=""
+                                            className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
+                                            value={input[field as keyof MealItem] as number}
+                                            onChange={(e) =>
+                                                handleChange(field as keyof MealItem, Number(e.target.value))
+                                            }
+                                            required
+                                        />
+                                        <label
+                                            htmlFor={field}
+                                            className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
+                                                        peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                                        peer-focus:-translate-y-2 peer-focus:text-xs"
+                                        >
+                                            {label}
+                                        </label>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </form>
                     {feedback.type === 'success' && (
