@@ -59,15 +59,23 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
     };
 
     const handleSubmit = async () => {
-        if (!input.name.trim()) {
-            setFeedback({ message: 'Please fill in  name before submitting', type: 'error' })
-        } else if (!input.mealtype) {
+        if (!input.name.trim() && !input.mealtype && !input.weight) {
+            setFeedback({ message: 'Please fill in  name, weight and mealtype before submitting', type: 'error' })
+        } else if (!input.name.trim() && !input.mealtype) {
+            setFeedback({ message: 'Please fill in name and mealtype before submitting', type: 'error' })
+        } else if (!input.name.trim() && !input.weight) {
+            setFeedback({ message: 'Please fill in name and weight before submitting', type: 'error' })
+        }else if (!input.name.trim()) {
+            setFeedback({ message: 'Please fill in name before submitting', type: 'error' })
+        }else if (!input.weight && !input.mealtype) {
+            setFeedback({ message: 'Please fill in mealtype and weight before submitting', type: 'error' })
+        }else if (!input.weight) {
+            setFeedback({ message: 'Please fill in weight before submitting', type: 'error' })
+        }else if (!input.mealtype) {
             setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error' })
-        } else if (!input.date) {
-            setFeedback({ message: 'Please fill in date before submitting', type: 'error' })
         } else {
             try {
-                //Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
+                // Vill justera vikten innan den skickas till backend så att den blir lättare att räkna med senare, 
                 // är dock fortfarande logiskt att skicka i gram för tillfället
                 const weightAdjustedInput = {
                     ...input,
@@ -100,7 +108,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         });
     };
 
-    const relevantCountries = ["Sweden", "Denmark", "Finland", "Sverige", "Tyskland", "Untied States", "United Kingdom"];
+    const relevantCountries = ["Sweden", "Denmark", "Finland", "Sverige", "Tyskland", "Germany", "Deutschland", "Untied States", "United Kingdom"];
 
     const handleSubmitInputOFFAPI = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -109,7 +117,6 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 .then(data => filterOFFDataByCountry(data.products || [], relevantCountries))
                 .then(filtered => setOFFdata(filtered))
                 .catch(console.error);
-            console.log(OFFdata);
         }
     }
 
@@ -327,8 +334,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                     <label
                                         htmlFor={field}
                                         className="absolute left-2 top-0 z-10 -translate-y-2 transform bg-white px-1 text-xs italic font-bold text-gray-500 transition-all
-                    peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
-                    peer-focus:-translate-y-2 peer-focus:text-xs"
+                                                    peer-placeholder-shown:translate-y-3 peer-placeholder-shown:text-sm
+                                                    peer-focus:-translate-y-2 peer-focus:text-xs"
                                     >
                                         {label}
                                     </label>
