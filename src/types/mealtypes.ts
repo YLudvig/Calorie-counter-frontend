@@ -6,6 +6,8 @@ export interface MealItem {
     date: string;
     name: string;
     weight: number;
+    volume: number; 
+    pieces: number; 
     mealtype: string;
     calories: number;
     protein: number;
@@ -33,6 +35,7 @@ export interface TypeTotal {
 
 export interface OFFMealItem {
     _id: string;
+    brands: string;
     countries?: string;
     product_name: string;
     nutriments?: {

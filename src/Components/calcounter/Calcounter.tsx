@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import Mealmodal, { mealTypes } from '../modals/Mealmodal';
-import { deleteMealItem, fetchMealsByUserAndDate, getDailyTotals, getTypeTotals, patchMealItem } from '../../API/MealAPICalls';
+import { deleteMealItem, fetchMealsByUserAndDate, getDailyTotals, getTypeTotals } from '../../API/MealAPICalls';
 import type { DailyTotal, MealItem, TypeTotal } from '../../types/mealtypes';
 import Sidebar from '../sidebar/Sidebar';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import type { User } from '../../types/AuthTypes';
 import React from 'react';
-import { FaEdit } from 'react-icons/fa';
+
 
 type CalcounterProps = {
     user: User;
@@ -39,8 +39,8 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     const openModal = () => setIsMealModalOpen(true);
     const closeModal = () => setIsMealModalOpen(false);
 
-    const [editingMealId, setEditingMealId] = useState<string | null>(null);
-    const [editedWeight, setEditedWeight] = useState<string>('');
+    /* const [editingMealId, setEditingMealId] = useState<string | null>(null);
+    const [editedWeight, setEditedWeight] = useState<string>(''); */
 
     //Håller koll på när nya mål läggs till och ändrar mealmodal count vilket i sig trackas av useEffect
     function handleMealModalSubmits() {
@@ -58,7 +58,6 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         getTypeTotals(user.userId, selectedDate)
             .then(setTypeData)
             .catch(console.error)
-        console.log(typeData)
     }, [mealModalCount, selectedDate]);
 
     //Funktion för att deleta item
@@ -74,12 +73,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     }
 
     //Funktion för att patcha vikten på mat 
-    async function patchMealItemById(mealItem: MealItem) {
+    /* async function patchMealItemById(mealItem: MealItem) {
         //Kallar funktionen för att ta bort det 
         await patchMealItem(mealItem);
         //För att trigga rerender efter tas bort 
         setMealModalCount(prev => prev + 1);
-    }
+    } */
 
     return (
         <div className="flex h-screen w-screen">
@@ -152,51 +151,21 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                     </div>
                                                 </td>
                                                 <td className="border border-gray-200 px-4 py-2 text-center">
-                                                    {editingMealId === item.mealId ? (
-                                                        <form
-                                                            onSubmit={(e) => {
-                                                                e.preventDefault();
-                                                                if (item.mealId && editedWeight) {
-                                                                    const updatedItem = {
-                                                                        ...item,
-                                                                        weight: parseFloat(editedWeight) / 100,
-                                                                    };
-                                                                    patchMealItemById(updatedItem);
-                                                                    setEditingMealId(null);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <input
-                                                                type="number"
-                                                                value={editedWeight}
-                                                                autoFocus
-                                                                onChange={(e) => setEditedWeight(e.target.value)}
-                                                                className="w-16 border border-gray-400 rounded px-1"
-                                                            />
-                                                            <button type="submit" className="ml-1 text-green-600">✔</button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setEditingMealId(null)}
-                                                                className="ml-1 text-red-600"
-                                                            >
-                                                                ✖
-                                                            </button>
-                                                        </form>
-                                                    ) : (
-                                                        <>
-                                                            {item.weight * 100}g
-                                                            <button
-                                                                onClick={() => {
-                                                                    setEditingMealId(item.mealId || '');
-                                                                    setEditedWeight((item.weight * 100).toString());
-                                                                }}
-                                                                className="ml-2 text-blue-600"
-                                                            >
-                                                                <FaEdit />
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </td>
+                                                    {(() => {
+                                                        let value = "";
+                                                        let label = "";
+                                                        if (item.weight !== 0) {
+                                                            value = (item.weight * 100).toFixed(0);
+                                                            label = "g";
+                                                        } else if (item.volume !== 0) {
+                                                            value = (item.volume * 100).toFixed(0);
+                                                            label = "ml";
+                                                        } else if (item.pieces !== 0) {
+                                                            value = item.pieces.toFixed(0);
+                                                            label = "pcs";
+                                                        }
+                                                        return value ? `${value} ${label}` : "";
+                                                    })()}                                                </td>
                                                 <td className="border border-gray-200 px-4 py-2 text-center">
                                                     {(item.calories * item.weight).toFixed(0)} kcal
                                                 </td>

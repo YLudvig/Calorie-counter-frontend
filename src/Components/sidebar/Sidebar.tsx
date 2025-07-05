@@ -59,8 +59,8 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
 
       <div className="pt-4 border-t border-blue-100 mt-6">
         <div className="flex items-center gap-2 text-sm text-gray-700 mb-3 pl-1">
-          <FaUserCircle size={20} className="text-blue-600" />
-          <span className="truncate">{userName}</span>
+          <FaUserCircle size={24} className="text-blue-600" />
+          <span className="truncate text-1xl">{userName}</span>
         </div>
         <button
           type="button"

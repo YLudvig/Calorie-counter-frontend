@@ -108,7 +108,7 @@ export async function patchMealItem(mealItem: MealItem) {
 export async function getFoodFromFoodFactsAPI(searchTerm: string) {
     try {
         const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(
-          searchTerm
+            searchTerm
         )}&fields=product_name,_id,countries,nutriments,brands,code&json=1`);
         if (!response.ok) {
             throw new Error('Problem med nätverksresponsen');
