@@ -40,7 +40,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     const closeModal = () => setIsMealModalOpen(false);
 
     const [editingMealId, setEditingMealId] = useState<string | null>(null);
-    const [editedWeight, setEditedWeight] = useState<string>('');
+    const [editingUnit, setEditingUnit] = useState<'weight' | 'volume' | 'pieces'>('weight');
+    const [editedWeight, setEditedWeight] = useState<number>(0);
+    const [editedVolume, setEditedVolume] = useState<number>(0);
+    const [editedPieces, setEditedPieces] = useState<number>(0);
+
+
 
     //Håller koll på när nya mål läggs till och ändrar mealmodal count vilket i sig trackas av useEffect
     function handleMealModalSubmits() {
@@ -160,22 +165,44 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                         <div className="flex items-center justify-center gap-2">
                                                             <input
                                                                 type="number"
-                                                                value={editedWeight}
-                                                                onChange={(e) => setEditedWeight(e.target.value)}
+                                                                value={
+                                                                    editingUnit === 'weight'
+                                                                        ? editedWeight
+                                                                        : editingUnit === 'volume'
+                                                                            ? editedVolume
+                                                                            : editedPieces
+                                                                }
+                                                                onChange={e => {
+                                                                    const val = Number(e.target.value);
+                                                                    if (editingUnit === 'weight') setEditedWeight(val);
+                                                                    else if (editingUnit === 'volume') setEditedVolume(val);
+                                                                    else setEditedPieces(val);
+                                                                }}
                                                                 className="w-20 border border-gray-300 rounded text-center"
                                                             />
+                                                            <span className="ml-1">
+                                                                {editingUnit === 'weight' ? 'g' : editingUnit === 'volume' ? 'ml' : 'pcs'}
+                                                            </span>
                                                             <button
                                                                 onClick={async () => {
-                                                                    if (!editedWeight || isNaN(Number(editedWeight))) return alert("Invalid weight");
+                                                                    let value = 0;
+                                                                    if (editingUnit === 'weight') value = editedWeight;
+                                                                    else if (editingUnit === 'volume') value = editedVolume;
+                                                                    else value = editedPieces;
+
+                                                                    if (!value || isNaN(Number(value))) return alert("Invalid value");
 
                                                                     const updatedItem = {
                                                                         ...item,
-                                                                        weight: Number(editedWeight) / 100,
+                                                                        weight: editingUnit === 'weight' ? Number(editedWeight) / 100 : 0,
+                                                                        volume: editingUnit === 'volume' ? Number(editedVolume) / 100 : 0,
+                                                                        pieces: editingUnit === 'pieces' ? Number(editedPieces) : 0,
                                                                     };
-
                                                                     await patchMealItemById(updatedItem);
                                                                     setEditingMealId(null);
-                                                                    setEditedWeight('');
+                                                                    setEditedWeight(0);
+                                                                    setEditedVolume(0);
+                                                                    setEditedPieces(0);
                                                                 }}
                                                             >
                                                                 ✅
@@ -183,7 +210,9 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                             <button
                                                                 onClick={() => {
                                                                     setEditingMealId(null);
-                                                                    setEditedWeight('');
+                                                                    setEditedWeight(0);
+                                                                    setEditedVolume(0);
+                                                                    setEditedPieces(0);
                                                                 }}
                                                             >
                                                                 ❌
@@ -220,13 +249,23 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                         </button>
                                                         <button onClick={() => {
                                                             if (item.mealId) {
-                                                                if (editingMealId === item.mealId) {
-                                                                    setEditingMealId(null);
-                                                                    setEditedWeight('');
-                                                                } else {
-                                                                    setEditingMealId(item.mealId);
-                                                                    setEditedWeight((item.weight * 100).toFixed(0));
+                                                                let unit: 'weight' | 'volume' | 'pieces' = 'weight';
+                                                                let value = 0;
+                                                                if (item.weight !== 0) {
+                                                                    unit = 'weight';
+                                                                    value = Number((item.weight * 100).toFixed(0));
+                                                                    setEditedWeight(value);
+                                                                } else if (item.volume !== 0) {
+                                                                    unit = 'volume';
+                                                                    value = Number((item.volume * 100).toFixed(0));
+                                                                    setEditedVolume(value);
+                                                                } else if (item.pieces !== 0) {
+                                                                    unit = 'pieces';
+                                                                    value = Number(item.pieces.toFixed(0));
+                                                                    setEditedPieces(value);
                                                                 }
+                                                                setEditingMealId(item.mealId);
+                                                                setEditingUnit(unit);
                                                             }
                                                         }}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-6 w-6" x-tooltip="tooltip">
