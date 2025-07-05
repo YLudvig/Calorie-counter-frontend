@@ -7,7 +7,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import type { User } from '../../types/AuthTypes';
 import React from 'react';
-import { FaEdit } from 'react-icons/fa';
+
 
 type CalcounterProps = {
     user: User;
@@ -40,7 +40,12 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
     const closeModal = () => setIsMealModalOpen(false);
 
     const [editingMealId, setEditingMealId] = useState<string | null>(null);
-    const [editedWeight, setEditedWeight] = useState<string>('');
+    const [editingUnit, setEditingUnit] = useState<'weight' | 'volume' | 'pieces'>('weight');
+    const [editedWeight, setEditedWeight] = useState<number>(0);
+    const [editedVolume, setEditedVolume] = useState<number>(0);
+    const [editedPieces, setEditedPieces] = useState<number>(0);
+
+
 
     //Håller koll på när nya mål läggs till och ändrar mealmodal count vilket i sig trackas av useEffect
     function handleMealModalSubmits() {
@@ -58,12 +63,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
         getTypeTotals(user.userId, selectedDate)
             .then(setTypeData)
             .catch(console.error)
-        console.log(typeData)
     }, [mealModalCount, selectedDate]);
 
     //Funktion för att deleta item
-    async function deleteMealItemById(mealId: string, userId: string) {
-        if (confirm("Do you want to delete this item?")) {
+    async function deleteMealItemById(mealId: string, userId: string, name: string, mealtype: string) {
+        if (confirm("Do you want to delete " + name + " from " + (mealtype.toLowerCase()) + "?")) {
             //Kallar funktionen för att ta bort det 
             await deleteMealItem(mealId, userId);
             //För att trigga rerender efter tas bort 
@@ -114,12 +118,11 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm">
-                    <table className="min-w-full table-fixed border border-blue-100 text-sm">
+                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[800px]">
+                    <table className="min-w-full table-fixed text-sm border-collapse">
                         <tbody>
                             {mealTypes.map(type => {
                                 const typeTotals = typeData.find(item => item.mealType === type);
-
                                 const items = data.filter(item => item.mealtype === type);
 
                                 if (items.length === 0) return null;
@@ -127,94 +130,187 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                 return (
                                     <React.Fragment key={type}>
                                         <tr>
-                                            <td colSpan={7} className="border bg-gray-200 font-bold px-4 py-2 capitalize text-center">
+                                            <td
+                                                colSpan={9}
+                                                className="border border-gray-200 bg-gray-100 font-bold px-4 py-2 capitalize text-center"
+                                            >
                                                 {type}
                                             </td>
                                         </tr>
                                         {items.map(item => (
-                                            <tr key={item.mealId} className="border bg-gray-100 hover:bg-gray-200 transition duration-300 ease-in-out">
-                                                <td className="border px-4 py-2">{item.name}
-                                                    <div className="flex justify-between items-center overflow-x-auto whitespace-nowrap">
-                                                        <button className="text-red-500 pl-2" onClick={() => { if (item.mealId) deleteMealItemById(item.mealId, user.userId) }}>[X]</button>
-                                                    </div>
+                                            <tr
+                                                key={item.mealId}
+                                                className="border border-gray-200 bg-white hover:bg-gray-50 transition duration-200"
+                                            >
+                                                <td className="border border-gray-200 px-4 py-2">
+                                                    {item.name}
                                                 </td>
-                                                <td className="border px-4 py-2 text-center">
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.calories * item.weight).toFixed(0)} kcal
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.protein * item.weight).toFixed(0)}g protein
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.carbs * item.weight).toFixed(0)}g carbs
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.fats * item.weight).toFixed(0)}g fats
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
+                                                    {(item.fiber * item.weight).toFixed(0)}g fiber
+                                                </td>
+                                                <td className="border border-gray-200 px-4 py-2 text-center">
                                                     {editingMealId === item.mealId ? (
-                                                        <form
-                                                            onSubmit={(e) => {
-                                                                e.preventDefault();
-                                                                if (item.mealId && editedWeight) {
-                                                                    const updatedItem = {
-                                                                        ...item,
-                                                                        weight: parseFloat(editedWeight) / 100, // divide by 100 to convert from g to portion
-                                                                    };
-                                                                    patchMealItemById(updatedItem);
-                                                                    setEditingMealId(null);
-                                                                }
-                                                            }}
-                                                        >
+                                                        <div className="flex items-center justify-center gap-2">
                                                             <input
                                                                 type="number"
-                                                                value={editedWeight}
-                                                                autoFocus
-                                                                onChange={(e) => setEditedWeight(e.target.value)}
-                                                                className="w-16 border border-gray-400 rounded px-1"
+                                                                value={
+                                                                    editingUnit === 'weight'
+                                                                        ? editedWeight
+                                                                        : editingUnit === 'volume'
+                                                                            ? editedVolume
+                                                                            : editedPieces
+                                                                }
+                                                                onChange={e => {
+                                                                    const val = Number(e.target.value);
+                                                                    if (editingUnit === 'weight') setEditedWeight(val);
+                                                                    else if (editingUnit === 'volume') setEditedVolume(val);
+                                                                    else setEditedPieces(val);
+                                                                }}
+                                                                className="w-20 border border-gray-300 rounded text-center"
                                                             />
-                                                            <button type="submit" className="ml-1 text-green-600">✔</button>
+                                                            <span className="ml-1">
+                                                                {editingUnit === 'weight' ? 'g' : editingUnit === 'volume' ? 'ml' : 'pcs'}
+                                                            </span>
                                                             <button
-                                                                type="button"
-                                                                onClick={() => setEditingMealId(null)}
-                                                                className="ml-1 text-red-600"
+                                                                onClick={async () => {
+                                                                    let value = 0;
+                                                                    if (editingUnit === 'weight') value = editedWeight;
+                                                                    else if (editingUnit === 'volume') value = editedVolume;
+                                                                    else value = editedPieces;
+
+                                                                    if (!value || isNaN(Number(value))) return alert("Invalid value");
+
+                                                                    const updatedItem = {
+                                                                        ...item,
+                                                                        weight: editingUnit === 'weight' ? Number(editedWeight) / 100 : 0,
+                                                                        volume: editingUnit === 'volume' ? Number(editedVolume) / 100 : 0,
+                                                                        pieces: editingUnit === 'pieces' ? Number(editedPieces) : 0,
+                                                                    };
+                                                                    await patchMealItemById(updatedItem);
+                                                                    setEditingMealId(null);
+                                                                    setEditedWeight(0);
+                                                                    setEditedVolume(0);
+                                                                    setEditedPieces(0);
+                                                                }}
                                                             >
-                                                                ✖
+                                                                ✅
                                                             </button>
-                                                        </form>
-                                                    ) : (
-                                                        <>
-                                                            {item.weight * 100}g
                                                             <button
                                                                 onClick={() => {
-                                                                    setEditingMealId(item.mealId || '');
-                                                                    setEditedWeight((item.weight * 100).toString());
+                                                                    setEditingMealId(null);
+                                                                    setEditedWeight(0);
+                                                                    setEditedVolume(0);
+                                                                    setEditedPieces(0);
                                                                 }}
-                                                                className="ml-2 text-blue-600"
                                                             >
-                                                                <FaEdit />
+                                                                ❌
                                                             </button>
-                                                        </>
+                                                        </div>
+                                                    ) : (
+                                                        (() => {
+                                                            let value = "";
+                                                            let label = "";
+                                                            if (item.weight !== 0) {
+                                                                value = (item.weight * 100).toFixed(0);
+                                                                label = "g";
+                                                            } else if (item.volume !== 0) {
+                                                                value = (item.volume * 100).toFixed(0);
+                                                                label = "ml";
+                                                            } else if (item.pieces !== 0) {
+                                                                value = item.pieces.toFixed(0);
+                                                                label = "pcs";
+                                                            }
+                                                            return value ? `${value} ${label}` : "";
+                                                        })()
                                                     )}
                                                 </td>
-                                                <td className="border px-4 py-2 text-center">{(item.calories * item.weight).toFixed(0)} kcal</td>
-                                                <td className="border px-4 py-2 text-center">{(item.protein * item.weight).toFixed(0)}g protein</td>
-                                                <td className="border px-4 py-2 text-center">{(item.carbs * item.weight).toFixed(0)}g carbs</td>
-                                                <td className="border px-4 py-2 text-center">{(item.fats * item.weight).toFixed(0)}g fats</td>
-                                                <td className="border px-4 py-2 text-center">{(item.fiber * item.weight).toFixed(0)}g fiber</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex justify-end gap-4">
+                                                        <button onClick={() => {
+                                                            if (item.mealId) {
+                                                                deleteMealItemById(item.mealId, user.userId, item.name, item.mealtype);
+                                                            }
+                                                        }}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-6 w-6" x-tooltip="tooltip">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                            </svg>
+                                                        </button>
+                                                        <button onClick={() => {
+                                                            if (item.mealId) {
+                                                                let unit: 'weight' | 'volume' | 'pieces' = 'weight';
+                                                                let value = 0;
+                                                                if (item.weight !== 0) {
+                                                                    unit = 'weight';
+                                                                    value = Number((item.weight * 100).toFixed(0));
+                                                                    setEditedWeight(value);
+                                                                } else if (item.volume !== 0) {
+                                                                    unit = 'volume';
+                                                                    value = Number((item.volume * 100).toFixed(0));
+                                                                    setEditedVolume(value);
+                                                                } else if (item.pieces !== 0) {
+                                                                    unit = 'pieces';
+                                                                    value = Number(item.pieces.toFixed(0));
+                                                                    setEditedPieces(value);
+                                                                }
+                                                                setEditingMealId(item.mealId);
+                                                                setEditingUnit(unit);
+                                                            }
+                                                        }}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-6 w-6" x-tooltip="tooltip">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         ))}
-                                        <tr className="border bg-gray-200">
-                                            <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Total {type}</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCalories ?? 0).toFixed(0)} kcal</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalProtein ?? 0).toFixed(0)}g protein</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalCarbs ?? 0).toFixed(0)}g carbs</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFats ?? 0)?.toFixed(0)}g fats</td>
-                                            <td className="border px-4 py-2 text-center">{(typeTotals?.totalFiber ?? 0).toFixed(0)}g fiber</td>
+                                        <tr className="bg-gray-200 border border-gray-300">
+                                            <td colSpan={9} className="px-4 py-3 text-left font-medium text-gray-800">
+                                                <div className="grid grid-cols-6 gap-x-8 pl-4">
+                                                    <span className="font-bold">{typeTotals?.mealType} Total</span>
+                                                    <span>{(typeTotals?.totalCalories ?? 0).toFixed(0)} kcal</span>
+                                                    <span>{(typeTotals?.totalProtein ?? 0).toFixed(0)}g protein</span>
+                                                    <span>{(typeTotals?.totalCarbs ?? 0).toFixed(0)}g carbs</span>
+                                                    <span>{(typeTotals?.totalFats ?? 0).toFixed(0)}g fats</span>
+                                                    <span>{(typeTotals?.totalFiber ?? 0).toFixed(0)}g fiber</span>
+                                                </div>
+                                            </td>
                                         </tr>
+
                                     </React.Fragment>
                                 );
                             })}
+
                             {dailyData && (
-                                <tr className="border bg-gray-300">
-                                    <td className="border px-4 py-2 text-center font-bold" colSpan={2}>Daily total</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcalories ?? 0).toFixed(0)} kcal</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumprotein ?? 0).toFixed(0)}g protein</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumcarbs ?? 0).toFixed(0)}g carbs</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfats ?? 0).toFixed(0)}g fats</td>
-                                    <td className="border px-4 py-2 text-center">{(dailyData.sumfiber ?? 0).toFixed(0)}g fiber</td>
+                                <tr className="bg-gray-200 border border-gray-300">
+                                    <td colSpan={9} className="px-4 py-3 text-left font-medium text-gray-800">
+                                        <div className="grid grid-cols-6 gap-x-8 pl-4">
+                                            <span className="font-bold">Daily Total</span>
+                                            <span>{(dailyData.sumcalories ?? 0).toFixed(0)} kcal</span>
+                                            <span>{(dailyData.sumprotein ?? 0).toFixed(0)}g protein</span>
+                                            <span>{(dailyData.sumcarbs ?? 0).toFixed(0)}g carbs</span>
+                                            <span>{(dailyData.sumfats ?? 0).toFixed(0)}g fats</span>
+                                            <span>{(dailyData.sumfiber ?? 0).toFixed(0)}g fiber</span>
+                                        </div>
+                                    </td>
                                 </tr>
                             )}
+
                             {data.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} className="border px-4 py-2 text-center">
+                                    <td colSpan={9} className="border border-gray-200 px-4 py-2 text-center text-gray-500">
                                         No meals added for this day
                                     </td>
                                 </tr>

@@ -22,7 +22,7 @@ export const mealTypes: MealType[] = [
 export const amount = [
     'ml',
     'g',
-    'piece'
+    'pieces'
 ]
 
 export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDate }: MealModalProps) {
@@ -32,6 +32,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         date: new Date().toISOString().slice(0, 10),
         mealtype: "",
         weight: 0,
+        volume: 0,
+        pieces: 0,
         calories: 0,
         protein: 0,
         carbs: 0,
@@ -77,8 +79,12 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
             setFeedback({ message: 'Please fill in name before submitting', type: 'error' })
         } else if (!input.weight && !input.mealtype) {
             setFeedback({ message: 'Please fill in mealtype and weight before submitting', type: 'error' })
-        } else if (!input.weight) {
-            setFeedback({ message: 'Please fill in weight before submitting', type: 'error' })
+        } else if (
+            (selectedUnit === 'g' && !input.weight) ||
+            (selectedUnit === 'ml' && !input.volume) ||
+            (selectedUnit === 'pieces' && !input.pieces)
+        ) {
+            setFeedback({ message: `Please fill in ${selectedUnit === 'g' ? 'weight' : selectedUnit === 'ml' ? 'volume' : 'pieces'} before submitting`, type: 'error' })
         } else if (!input.mealtype) {
             setFeedback({ message: 'Please fill in mealtype before submitting', type: 'error' })
         } else {
@@ -87,7 +93,9 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 // är dock fortfarande logiskt att skicka i gram för tillfället
                 const weightAdjustedInput = {
                     ...input,
-                    weight: selectedUnit === 'piece' ? input.weight : input.weight / 100,
+                    pieces: selectedUnit === 'pieces' ? input.pieces : 0,
+                    volume: selectedUnit === 'ml' ? input.volume / 100 : 0,
+                    weight: selectedUnit === 'g' ? input.weight / 100 : 0,
                     userId: user.userId,
                     date: selectedDate,
                 };
@@ -125,6 +133,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                 .then(data => filterOFFDataByCountry(data.products || [], relevantCountries))
                 .then(filtered => setOFFdata(filtered))
                 .catch(console.error);
+            console.log(OFFdata);
         }
     }
 
@@ -178,6 +187,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
         setSelectedMealId("");
         setSelectedOFFMealId("");
         setSearchTerm("");
+        setSelectedUnit("g");
         setOFFdata([]);
         onClose();
     }
@@ -241,7 +251,7 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                 Select from food you searched for
                             </option>
                             {OFFdata.map((food) => <option value={food._id} key={food._id}>
-                                {food.product_name}
+                                {food.product_name + ' (' + (food.brands) + ')'}
                             </option>)}
                         </select>
                         <select className="mt-2 p-2 border rounded w-full"
@@ -358,8 +368,8 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                             ? 'Weight (g)'
                                             : selectedUnit === 'ml'
                                                 ? 'Volume (ml)'
-                                                : selectedUnit === 'piece'
-                                                    ? 'Piece'
+                                                : selectedUnit === 'pieces'
+                                                    ? 'Pieces'
                                                     : 'Weight';
                                 }
 
@@ -370,10 +380,27 @@ export default function Mealmodal({ isOpen, onClose, onAction, user, selectedDat
                                             type="number"
                                             placeholder=""
                                             className="peer block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                                            value={input[field as keyof MealItem] as number}
-                                            onChange={(e) =>
-                                                handleChange(field as keyof MealItem, Number(e.target.value))
+                                            value={
+                                                field === "weight"
+                                                    ? selectedUnit === "g"
+                                                        ? input.weight
+                                                        : selectedUnit === "ml"
+                                                            ? input.volume
+                                                            : selectedUnit === "pieces"
+                                                                ? input.pieces
+                                                                : input.weight
+                                                    : (input[field as keyof MealItem] as number)
                                             }
+                                            onChange={(e) => {
+                                                const val = Number(e.target.value);
+                                                if (field === "weight") {
+                                                    if (selectedUnit === "g") handleChange("weight", val);
+                                                    else if (selectedUnit === "ml") handleChange("volume", val);
+                                                    else if (selectedUnit === "pieces") handleChange("pieces", val);
+                                                } else {
+                                                    handleChange(field as keyof MealItem, val);
+                                                }
+                                            }}
                                             required
                                         />
                                         <label
