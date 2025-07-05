@@ -248,24 +248,31 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                                                             </svg>
                                                         </button>
                                                         <button onClick={() => {
-                                                            if (item.mealId) {
-                                                                let unit: 'weight' | 'volume' | 'pieces' = 'weight';
-                                                                let value = 0;
-                                                                if (item.weight !== 0) {
-                                                                    unit = 'weight';
-                                                                    value = Number((item.weight * 100).toFixed(0));
-                                                                    setEditedWeight(value);
-                                                                } else if (item.volume !== 0) {
-                                                                    unit = 'volume';
-                                                                    value = Number((item.volume * 100).toFixed(0));
-                                                                    setEditedVolume(value);
-                                                                } else if (item.pieces !== 0) {
-                                                                    unit = 'pieces';
-                                                                    value = Number(item.pieces.toFixed(0));
-                                                                    setEditedPieces(value);
+                                                            if (editingMealId === item.mealId) {
+                                                                setEditingMealId(null);
+                                                                setEditedWeight(0);
+                                                                setEditedPieces(0);
+                                                                setEditedVolume(0);
+                                                            } else {
+                                                                if (item.mealId) {
+                                                                    let unit: 'weight' | 'volume' | 'pieces' = 'weight';
+                                                                    let value = 0;
+                                                                    if (item.weight !== 0) {
+                                                                        unit = 'weight';
+                                                                        value = Number((item.weight * 100).toFixed(0));
+                                                                        setEditedWeight(value);
+                                                                    } else if (item.volume !== 0) {
+                                                                        unit = 'volume';
+                                                                        value = Number((item.volume * 100).toFixed(0));
+                                                                        setEditedVolume(value);
+                                                                    } else if (item.pieces !== 0) {
+                                                                        unit = 'pieces';
+                                                                        value = Number(item.pieces.toFixed(0));
+                                                                        setEditedPieces(value);
+                                                                    }
+                                                                    setEditingMealId(item.mealId);
+                                                                    setEditingUnit(unit);
                                                                 }
-                                                                setEditingMealId(item.mealId);
-                                                                setEditingUnit(unit);
                                                             }
                                                         }}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-6 w-6" x-tooltip="tooltip">
