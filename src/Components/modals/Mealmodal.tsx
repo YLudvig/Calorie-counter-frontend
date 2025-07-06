@@ -14,9 +14,8 @@ interface MealModalProps {
 export const mealTypes: MealType[] = [
     'Breakfast',
     'Lunch',
-    'Snack',
     'Dinner',
-    'Evening snack'
+    'Snack'
 ];
 
 export const amount = [
