@@ -138,7 +138,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[800px]">
+                <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[1000px]">
                     <table className="min-w-full table-fixed text-sm border-collapse">
                         <tbody>
                             {mealTypes.map(type => {
