@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "../../types/AuthTypes";
 import Sidebar from "../sidebar/Sidebar";
-import { addWeightTrackingItem, fetchWeeks, fetchWeightTrackingByUser } from "../../API/WeightTrackingAPICalls";
+import { addWeightTrackingItem, fetchWeeks, fetchWeightTrackingByUser, patchWeightTrackingItem } from "../../API/WeightTrackingAPICalls";
 import React from "react";
 import type { WeightTrackingInfo } from '../../types/WeightTrackingTypes';;
 
@@ -46,7 +46,8 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
             if (isNewEntry) {
                 await addWeightTrackingItem(body);
             } else {
-                return;
+                await patchWeightTrackingItem(body);
+                console.log("Patched weight");
             }
 
             setEditedWeights((prev) => {
@@ -86,6 +87,9 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                 await addWeightTrackingItem(body);
                 console.log("You goofed up");
                 console.log(body);
+            } else {
+                await patchWeightTrackingItem(body);
+                console.log("Patched calories");
             }
 
             setEditedCalories((prev) => {
