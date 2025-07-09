@@ -34,7 +34,7 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               }`}
           >
-            Food diary
+            Food Diary
           </Link>
           <Link
             to="/weighttracking"

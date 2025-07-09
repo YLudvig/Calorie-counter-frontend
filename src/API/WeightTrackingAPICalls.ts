@@ -64,3 +64,18 @@ export async function patchWeightTrackingItem(weightTrackingInfo : WeightTrackin
         throw error;
     }
 }
+
+export async function fetchAverages(userId: string) {
+    try {
+        const response = await fetchApi(
+            `/weighttracking/getAveragesByUserId?userId=${encodeURIComponent(userId)}`
+        );
+        if (!response.ok) {
+            throw new Error('Problem med nätverksresponsen');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Det blev ett problem med fetchen', error);
+        return { success: false, error: (error as Error).message };
+    }
+}
