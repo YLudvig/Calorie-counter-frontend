@@ -16,10 +16,10 @@ export async function fetchWeightTrackingByUser(userId: string) {
     }
 }
 
-export async function fetchWeeks() {
+export async function fetchCurrentWeek() {
     try {
         const response = await fetchApi(
-            `/calendardate/getAllWeeks`
+            `/calendardate/getCurrentWeek`
         );
         if (!response.ok) {
             throw new Error('Problem med nätverksresponsen');
