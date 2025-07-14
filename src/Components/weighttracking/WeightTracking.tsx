@@ -4,7 +4,7 @@ import Sidebar from "../sidebar/Sidebar";
 import {
   addWeightTrackingItem,
   fetchAverages,
-  fetchWeeks,
+  fetchCurrentWeek,
   fetchWeightTrackingByUser,
   patchWeightTrackingItem,
 } from "../../API/WeightTrackingAPICalls";
@@ -30,7 +30,9 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
 
   const [wtData, setWtData] = useState<WeightTrackingInfo[]>([]);
 
-  const [wData, setWData] = useState<[]>([]);
+  const [currWeek, setCurrentWeek] = useState<number>();
+
+  const weeksArray = Array.from({ length: 53 }, (_, i) => i + 1);
 
   const [avgData, setAvgData] = useState<avgData[]>([]);
 
@@ -59,14 +61,11 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
         await addWeightTrackingItem(body);
       } else {
         await patchWeightTrackingItem(body);
-        console.log("Patched weight");
       }
 
       setEditedWeights((prev) => {
         const updated = { ...prev };
         delete updated[key];
-        console.log("You goofed up");
-        console.log(entry.weightTrackingId);
         return updated;
       });
     } catch (err) {
@@ -117,16 +116,17 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
   };
 
   useEffect(() => {
-    fetchWeeks().then(setWData).catch(console.error);
+    fetchCurrentWeek().then(setCurrentWeek).catch(console.error);
     fetchWeightTrackingByUser(user.userId).then(setWtData).catch(console.error);
     fetchAverages(user.userId).then(setAvgData).catch(console.error);
+    console.log(currWeek); //Funkar inte riktigt
   }, [user.userId, addWeightTrackingItem, patchWeightTrackingItem]);
 
   return (
     <div className="flex h-screen w-screen">
       <Sidebar user={user} setUser={setUser} />
       <div className="flex-grow p-6 overflow-auto rounded-lg flex flex-col items-center">
-        <div className="max-h-96 overflow-y-auto overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[1000px]">
+        <div className="max-h-120 overflow-y-auto overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[1000px]">
           <table className="table-fixed min-w-full border-collapse border border-gray-400">
             <thead className="bg-gray-200">
               <tr>
@@ -165,7 +165,7 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                 </th>
               </tr>
             </thead>
-            {wData.map((week) => (
+            {weeksArray.map((week) => (
               <tbody key={week}>
                 <tr>
                   <td

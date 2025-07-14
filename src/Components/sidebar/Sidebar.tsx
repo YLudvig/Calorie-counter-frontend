@@ -29,19 +29,21 @@ export default function Sidebar({ user, setUser }: SidebarProps) {
         <nav className="flex flex-col space-y-2">
           <Link
             to="/calcounter"
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === "/calcounter"
-              ? "bg-blue-100 text-blue-700"
-              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              }`}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              currentPath === "/calcounter"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+            }`}
           >
             Food Diary
           </Link>
           <Link
             to="/weighttracking"
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPath === "/weighttracking"
-              ? "bg-blue-100 text-blue-700"
-              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-              }`}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              currentPath === "/weighttracking"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+            }`}
           >
             Weight Tracking
           </Link>
