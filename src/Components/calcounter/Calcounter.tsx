@@ -145,8 +145,8 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
           </div>
         </div>
 
-        <div className="flex flex-grow gap-8 justify-center">
-          <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-full">
+        <div className="flex gap-8 justify-center">
+          <div className="overflow-x-auto rounded-sm border border-blue-100 shadow-sm">
             <table className="min-w-full table-fixed text-sm border-collapse">
               <tbody>
                 {mealTypes.map((type) => {
@@ -432,7 +432,7 @@ export default function Calcounter({ user, setUser }: CalcounterProps) {
               </tbody>
             </table>
           </div>
-          <div className="flex flex-col items-center w-1/4 space-y-6">
+          <div className="flex flex-col items-center w-1/9 space-y-6">
             <ProgressCirclesForFood
               name="Calories"
               value={
