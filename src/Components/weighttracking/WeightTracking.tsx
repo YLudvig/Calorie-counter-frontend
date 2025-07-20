@@ -126,7 +126,7 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
     <div className="flex h-screen w-screen">
       <Sidebar user={user} setUser={setUser} />
       <div className="flex-grow p-6 overflow-auto rounded-lg flex flex-col items-center">
-        <div className="max-h-120 overflow-y-auto overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[1000px]">
+        <div className="max-h-200 overflow-y-auto overflow-x-auto rounded-sm border border-blue-100 shadow-sm w-[1000px]">
           <table className="table-fixed min-w-full border-collapse border border-gray-400">
             <thead className="bg-gray-200">
               <tr>
