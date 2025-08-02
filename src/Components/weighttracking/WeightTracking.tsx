@@ -4,7 +4,6 @@ import Sidebar from "../sidebar/Sidebar";
 import {
   addWeightTrackingItem,
   fetchAverages,
-  fetchCurrentWeek,
   fetchWeightTrackingByUser,
   patchWeightTrackingItem,
 } from "../../API/WeightTrackingAPICalls";
@@ -20,17 +19,17 @@ type WeightTrackingProps = {
 };
 
 export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
-  const [editedCalories, setEditedCalories] = useState<{
-    [key: string]: string;
-  }>({});
-
-  const [editedWeights, setEditedWeights] = useState<{ [key: string]: string }>(
+  const [localWeights, setLocalWeights] = useState<{ [key: string]: string }>(
     {}
   );
 
-  const [wtData, setWtData] = useState<WeightTrackingInfo[]>([]);
+  const [localCalories, setLocalCalories] = useState<{ [key: string]: string }>(
+    {}
+  );
 
-  const [currWeek, setCurrentWeek] = useState<number>();
+  const getKey = (week: number, day: string) => `${week}-${day}`;
+
+  const [wtData, setWtData] = useState<WeightTrackingInfo[]>([]);
 
   const weeksArray = Array.from({ length: 53 }, (_, i) => i + 1);
 
@@ -38,89 +37,119 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
 
   const handleWeightKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>,
-    entry: WeightTrackingInfo
+    week: number,
+    day: string
   ) => {
     if (e.key !== "Enter") return;
+    await saveWeightToBackend(week, day);
+  };
 
-    const key = `${entry.week}-${entry.inputWeekDay}`;
-    const value = editedWeights[key];
-    if (!value) return;
+  const handleWeightBlur = async (week: number, day: string) => {
+    await saveWeightToBackend(week, day);
+  };
 
-    const body: WeightTrackingInfo = {
-      ...entry,
-      weight: parseFloat(value),
-      dailycalories: entry.dailycalories ?? 0,
-    };
+  const saveWeightToBackend = async (week: number, day: string) => {
+    const key = getKey(week, day);
+    const value = localWeights[key];
+    const weightNum = parseFloat(value);
+
+    if (!value || isNaN(weightNum)) return;
+
+    const existingEntry = wtData.find(
+      (e) => e.week === week && e.inputWeekDay === day
+    );
+
+    const body: WeightTrackingInfo = existingEntry
+      ? { ...existingEntry, weight: weightNum }
+      : {
+          weightTrackingId: "",
+          userId: user.userId,
+          week,
+          inputWeekDay: day,
+          weight: weightNum,
+          dailycalories: 0,
+        };
 
     try {
-      const isNewEntry = !wtData.some(
-        (e) => e.week === entry.week && e.inputWeekDay === entry.inputWeekDay
-      );
-
-      if (isNewEntry) {
-        await addWeightTrackingItem(body);
-      } else {
+      if (existingEntry) {
         await patchWeightTrackingItem(body);
+      } else {
+        await addWeightTrackingItem(body);
       }
 
-      setEditedWeights((prev) => {
+      const freshData = await fetchWeightTrackingByUser(user.userId);
+      setWtData(freshData);
+
+      setLocalWeights((prev) => {
         const updated = { ...prev };
         delete updated[key];
         return updated;
       });
     } catch (err) {
-      console.error("Error submitting weight:", err);
+      console.error("Error saving weight:", err);
     }
   };
 
   const handleCaloriesKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>,
-    entry: WeightTrackingInfo
+    week: number,
+    day: string
   ) => {
     if (e.key !== "Enter") return;
+    await saveCaloriesToBackend(week, day);
+    (e.target as HTMLInputElement).blur();
+  };
 
-    const key = `${entry.week}-${entry.inputWeekDay}`;
-    const value = editedCalories[key];
-    if (!value) return;
+  const handleCaloriesBlur = async (week: number, day: string) => {
+    await saveCaloriesToBackend(week, day);
+  };
 
-    const body: WeightTrackingInfo = {
-      ...entry,
-      dailycalories: parseFloat(value),
-      weight: entry.weight ?? 0,
-    };
+  const saveCaloriesToBackend = async (week: number, day: string) => {
+    const key = getKey(week, day);
+    const value = localCalories[key];
+    const calNum = parseFloat(value);
+
+    if (!value || isNaN(calNum)) return;
+
+    const existingEntry = wtData.find(
+      (e) => e.week === week && e.inputWeekDay === day
+    );
+
+    const body: WeightTrackingInfo = existingEntry
+      ? { ...existingEntry, dailycalories: calNum }
+      : {
+          weightTrackingId: "",
+          userId: user.userId,
+          week,
+          inputWeekDay: day,
+          weight: 0,
+          dailycalories: calNum,
+        };
 
     try {
-      const isNewEntry = !wtData.some(
-        (e) => e.week === entry.week && e.inputWeekDay === entry.inputWeekDay
-      );
-
-      if (isNewEntry) {
-        await addWeightTrackingItem(body);
-        console.log("You goofed up");
-        console.log(body);
-      } else {
+      if (existingEntry) {
         await patchWeightTrackingItem(body);
-        console.log("Patched calories");
+      } else {
+        await addWeightTrackingItem(body);
       }
 
-      setEditedCalories((prev) => {
+      const freshData = await fetchWeightTrackingByUser(user.userId);
+      setWtData(freshData);
+
+      setLocalCalories((prev) => {
         const updated = { ...prev };
         delete updated[key];
-        console.log("You goofed up");
-        console.log(body);
         return updated;
       });
     } catch (err) {
-      console.error("Error submitting calories:", err);
+      console.error("Error saving calories:", err);
     }
   };
 
   useEffect(() => {
-    fetchCurrentWeek().then(setCurrentWeek).catch(console.error);
     fetchWeightTrackingByUser(user.userId).then(setWtData).catch(console.error);
     fetchAverages(user.userId).then(setAvgData).catch(console.error);
-    console.log(currWeek); //Funkar inte riktigt
-  }, [user.userId, addWeightTrackingItem, patchWeightTrackingItem]);
+  }, []);
 
   return (
     <div className="flex h-screen w-screen">
@@ -190,7 +219,6 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                     const entry = wtData.find(
                       (e) => e.week === week && e.inputWeekDay === day
                     );
-                    const value = editedWeights[key] ?? entry?.weight ?? "";
 
                     return (
                       <td
@@ -200,26 +228,20 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                         <input
                           type="number"
                           className="w-full p-0 text-center"
-                          value={value}
-                          onChange={(e) =>
-                            setEditedWeights((prev) => ({
+                          value={
+                            localWeights[getKey(week, day)] ??
+                            entry?.weight ??
+                            ""
+                          }
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setLocalWeights((prev) => ({
                               ...prev,
-                              [key]: e.target.value,
-                            }))
-                          }
-                          onKeyDown={(e) =>
-                            handleWeightKeyDown(
-                              e,
-                              entry ?? {
-                                weightTrackingId: "",
-                                userId: user.userId,
-                                week,
-                                inputWeekDay: day,
-                                weight: 0,
-                                dailycalories: 0,
-                              }
-                            )
-                          }
+                              [getKey(week, day)]: val,
+                            }));
+                          }}
+                          onKeyDown={(e) => handleWeightKeyDown(e, week, day)}
+                          onBlur={() => handleWeightBlur(week, day)}
                         />
                       </td>
                     );
@@ -255,8 +277,6 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                     const entry = wtData.find(
                       (e) => e.week === week && e.inputWeekDay === day
                     );
-                    const value =
-                      editedCalories[key] ?? entry?.dailycalories ?? "";
 
                     return (
                       <td
@@ -266,26 +286,20 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                         <input
                           type="number"
                           className="w-full p-0 text-center"
-                          value={value}
-                          onChange={(e) =>
-                            setEditedCalories((prev) => ({
+                          value={
+                            localCalories[getKey(week, day)] ??
+                            entry?.dailycalories ??
+                            ""
+                          }
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setLocalCalories((prev) => ({
                               ...prev,
-                              [key]: e.target.value,
-                            }))
-                          }
-                          onKeyDown={(e) =>
-                            handleCaloriesKeyDown(
-                              e,
-                              entry ?? {
-                                weightTrackingId: "",
-                                userId: user.userId,
-                                week,
-                                inputWeekDay: day,
-                                weight: 0,
-                                dailycalories: 0,
-                              }
-                            )
-                          }
+                              [getKey(week, day)]: val,
+                            }));
+                          }}
+                          onKeyDown={(e) => handleCaloriesKeyDown(e, week, day)}
+                          onBlur={() => handleCaloriesBlur(week, day)}
                         />
                       </td>
                     );
