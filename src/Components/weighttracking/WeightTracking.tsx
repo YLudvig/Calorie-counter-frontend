@@ -230,8 +230,9 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                           className="w-full p-0 text-center"
                           value={
                             localWeights[getKey(week, day)] ??
-                            entry?.weight ??
-                            ""
+                            (entry?.weight === 0 || entry?.weight == null
+                              ? ""
+                              : entry.weight)
                           }
                           onChange={(e) => {
                             const val = e.target.value;
@@ -247,9 +248,10 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                     );
                   })}
                   <td className="border border-gray-400 align-middle text-center px-2 py-1">
-                    {avgData
-                      .find((avg) => avg.week === week)
-                      ?.avg_weight?.toFixed(1) ?? ""}
+                    {avgData.find((avg) => avg.week === week)?.avg_weight === 0
+                      ? ""
+                      : avgData.find((avg) => avg.week === week)?.avg_weight ??
+                        ""}
                   </td>
                   <td
                     rowSpan={2}
@@ -288,8 +290,10 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                           className="w-full p-0 text-center"
                           value={
                             localCalories[getKey(week, day)] ??
-                            entry?.dailycalories ??
-                            ""
+                            (entry?.dailycalories === 0 ||
+                            entry?.dailycalories == null
+                              ? ""
+                              : entry.dailycalories)
                           }
                           onChange={(e) => {
                             const val = e.target.value;
@@ -305,8 +309,11 @@ export default function WeightTracking({ user, setUser }: WeightTrackingProps) {
                     );
                   })}
                   <td className="border border-gray-400 px-2 py-1 text-center">
-                    {avgData.find((avg) => avg.week === week)?.avg_calories ??
-                      ""}
+                    {avgData.find((avg) => avg.week === week)?.avg_calories ===
+                    0
+                      ? ""
+                      : avgData.find((avg) => avg.week === week)
+                          ?.avg_calories ?? ""}
                   </td>
                 </tr>
               </tbody>
